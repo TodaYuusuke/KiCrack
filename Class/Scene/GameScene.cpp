@@ -10,8 +10,10 @@ using namespace LWP::Info;
 
 // 初期化
 void GameScene::Initialize() {
+
 }
 
 // 更新
 void GameScene::Update() {
+
 }
