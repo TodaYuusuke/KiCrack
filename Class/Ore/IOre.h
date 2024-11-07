@@ -18,5 +18,14 @@ public: // ** メンバ関数 ** //
 
 private: // ** メンバ変数 ** //
 
+	/// <summary>
+	/// 鉱石のパラメーター(csvで定義)
+	/// </summary>
+	struct Parameter {
+		float kCollisionScale;	// 当たり判定スケール
+		int kHealth;			// 体力
+		float kRespawnTime;		// リポップ時間
 
+		float kMoveSpeed;		// 移動速度
+	}parameter_;
 };

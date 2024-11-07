@@ -23,11 +23,11 @@ private: // ** メンバ変数 ** //
 	/// </summary>
 	struct Parameter {
 		float kParryJumpPower;	// パリィジャンプ力
-		float kParryPower;		// パリィ攻撃力
+		int kParryPower;		// パリィ攻撃力
 
 		float kDropSpeed;		// ドロップ速度
-		float kDropPower;		// ドロップ攻撃力
 		float kDropJudgeTime;	// 長押し判定に必要な秒数
+		int kDropPower;			// ドロップ攻撃力
 
 		float kJumpPower;		// 通常ジャンプ力
 		float kGravity;			// 重力の強さ
