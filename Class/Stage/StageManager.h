@@ -1,4 +1,6 @@
 #pragma once
+#include "Field.h"
+#include "Ore/OreManager.h"
 
 /// <summary>
 /// ステージ管理クラス
@@ -18,5 +20,8 @@ public: // ** メンバ関数 ** //
 
 private: // ** メンバ変数 ** //
 
-
+	// 固定されている地形をまとめたクラス
+	Field field_;
+	// 鉱石管理クラス
+	OreManager oreManager_;
 };

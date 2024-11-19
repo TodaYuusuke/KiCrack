@@ -1,6 +1,9 @@
 #pragma once
 #include "scene/IScene.h"
 
+#include "Player/Player.h"
+#include "Stage/StageManager.h"
+
 class GameScene final
 	: public IScene {
 public:
@@ -17,4 +20,9 @@ public:
 
 private: //*** これより先に必要な処理や変数を記述 ***//
 
+	// プレイヤー
+	Player player_;
+
+	// ステージ管理クラス
+	StageManager stageManager_;
 };

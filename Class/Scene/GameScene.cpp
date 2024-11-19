@@ -10,10 +10,12 @@ using namespace LWP::Info;
 
 // 初期化
 void GameScene::Initialize() {
-
+	player_.Init(&mainCamera);
+	stageManager_.Init();
 }
 
 // 更新
 void GameScene::Update() {
-
+	player_.Update();
+	stageManager_.Update();
 }
