@@ -21,7 +21,7 @@ void Player::Init(LWP::Object::Camera* camera) {
 	parryCollision_.mask.SetBelongFrag(KCMask::Parry());
 	parryCollision_.mask.SetHitFrag(KCMask::Ore());
 	parryCollision_.SetFollowTarget(&model_.worldTF);
-	parryCollision_.stayLambda = [this](Collision* c) {
+	parryCollision_.enterLambda = [this](Collision* c) {
 		Jump();	// 鉱石にヒットしていた場合 -> ジャンプ処理を行う
 		statePattern_.request = State::Jump;
 		parryCollision_.isActive = false;
@@ -80,11 +80,9 @@ void Player::Update() {
 		ImGui::DragFloat("FallMaxSpeed", &parameter_.kFallMaxSpeed, 0.01f);
 		ImGui::Text("Parry");
 		ImGui::DragFloat("ParryJumpPower", &parameter_.kParryJumpPower, 0.01f);
-		ImGui::InputInt("ParryPower", &parameter_.kParryPower);
 		ImGui::Text("Drop");
 		ImGui::DragFloat("DropSpeed", &parameter_.kDropSpeed, 0.01f);
 		ImGui::DragFloat("DropJudgeTime", &parameter_.kDropJudgeTime, 0.01f);
-		ImGui::InputInt("DropPower", &parameter_.kDropPower);
 		ImGui::Text("Other");
 		ImGui::DragFloat("CameraOffsetZ", &parameter_.kCameraOffsetZ, 0.01f);
 		ImGui::DragFloat("kCameraMinBorderY", &parameter_.kCameraMinBorderY, 0.01f);

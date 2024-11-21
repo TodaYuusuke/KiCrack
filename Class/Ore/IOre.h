@@ -19,8 +19,10 @@ public: // ** メンバ関数 ** //
 
 protected: // ** メンバ変数 ** //
 
-	// モデル
-	LWP::Resource::RigidModel model_;
+	// 鉱石が生える地点を示すモデル
+	LWP::Resource::RigidModel spawnPointModel_;
+	// 鉱石自体のモデル
+	LWP::Resource::RigidModel model_[2];
 	// コライダー
 	LWP::Object::Collision collision_;
 
@@ -29,9 +31,12 @@ protected: // ** メンバ変数 ** //
 	/// </summary>
 	struct Parameter {
 		float kCollisionScale = 1.0f;	// 当たり判定スケール
-		int kHealth = 2;			// 体力
+		int kMaxHealth = 2;			// 最大体力
 		float kRespawnTime = 3.0f;		// リポップ時間
 
 		float kMoveSpeed = 0.0f;		// 移動速度
 	}parameter_;
+
+	// 体力
+	int hp_ = parameter_.kMaxHealth;
 };

@@ -30,8 +30,8 @@ private: // ** メンバ変数 ** //
 	// 太陽
 	LWP::Object::DirectionLight sun_;
 
-	// 左右の壁のモデル
-	LWP::Resource::RigidModel wall[2];
+	// 壁のモデル
+	LWP::Resource::RigidModel wall[3];
 	// 床のモデル
 	LWP::Resource::RigidModel floor;
 };

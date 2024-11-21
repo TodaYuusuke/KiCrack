@@ -31,12 +31,10 @@ private: // ** メンバ変数 ** //
 		float kFallMaxSpeed;	// 自然落下の速度制限
 
 		float kParryJumpPower = kJumpPower * 1.3f;	// パリィジャンプ力
-		int kParryPower = 1;		// パリィ攻撃力
 		float kParryReceptionTime = 0.3f;		// パリィの判定時間
 
 		float kDropSpeed;		// ドロップ速度
 		float kDropJudgeTime = 0.4f;	// 長押し判定に必要な秒数
-		int kDropPower = 2;			// ドロップ攻撃力
 
 		float kCameraOffsetZ = -25.0f;	// カメラの距離
 		float kCameraMinBorderY = 3.5f;	// カメラの最低Y座標
@@ -115,4 +113,12 @@ private: // ** 状態別関数 ** //
 	void InitDropAttak(const State&);
 	void UpdateDropAttak(std::optional<State>&, const State&);
 #pragma endregion
+
+
+public: // ** 外部から参照したいパラメーターを定義 ** //
+
+	// パリィ攻撃力
+	static const int kParryPower = 1;
+	// ドロップ攻撃力
+	static const int kDropPower = 2;
 };
