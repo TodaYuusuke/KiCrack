@@ -16,6 +16,10 @@ public: // ** メンバ関数 ** //
 	/// </summary>
 	void Update();
 
+	/// <summary>
+	/// 落下攻撃用の鉱石最大地点を返す関数
+	/// </summary>
+	float GetDropLevelBorder();
 
 private: // ** メンバ変数 ** //
 

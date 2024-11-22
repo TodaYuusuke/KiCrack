@@ -7,3 +7,7 @@ void StageManager::Init() {
 void StageManager::Update() {
 	oreManager_.Update();
 }
+
+float StageManager::GetDropLevelBorder() {
+	return oreManager_.GetDropLevelBorder();
+}

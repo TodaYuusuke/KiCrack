@@ -16,6 +16,12 @@ public: // ** メンバ関数 ** //
 	/// </summary>
 	void Update();
 
+	/// <summary>
+	/// 落下攻撃のレベルボーダーを設定
+	/// </summary>
+	/// <param name="y"></param>
+	void SetDropLevelBorder(float y) { dropLevelMaxHeight_ = y; }
+
 
 private: // ** メンバ変数 ** //
 	// カメラのポインタ
@@ -33,7 +39,8 @@ private: // ** メンバ変数 ** //
 		float kParryJumpPower = kJumpPower * 1.3f;	// パリィジャンプ力
 		float kParryReceptionTime = 0.3f;		// パリィの判定時間
 
-		float kDropSpeed;		// ドロップ速度
+		float kDropSpeed = 0.3f;		// ドロップ速度
+		float kDropEndJumpPower = 0.3f;		// ドロップ速度
 		float kDropJudgeTime = 0.4f;	// 長押し判定に必要な秒数
 
 		float kCameraOffsetZ = -25.0f;	// カメラの距離
@@ -59,7 +66,8 @@ private: // ** メンバ変数 ** //
 		Jump,	// ジャンプ
 		Parry,	// パリィ
 		Falling,	// 自由落下
-		DropAttak,	// 落下攻撃
+		DropStart,	// 落下攻撃開始
+		Dropping,	// 落下攻撃中
 		Count	// サイズカウント
 	};
 	LWP::Utility::StatePattern<State, static_cast<int>(State::Count)> statePattern_;
@@ -71,6 +79,10 @@ private: // ** メンバ変数 ** //
 	float velocityY_ = 0.0f;
 	// パリィの残り時間
 	float parryTime_ = 0.0f;
+	// 落下攻撃までの入力時間
+	float dropInputTime_ = 0.0f;
+	// 落下攻撃のレベル判定用の高さ
+	float dropLevelMaxHeight_ = 0.0f;
 
 private: // ** プライベートなメンバ関数 ** //
 
@@ -86,6 +98,10 @@ private: // ** プライベートなメンバ関数 ** //
 	/// パリィ処理（パリィが成功した場合trueを返す）
 	/// </summary>
 	bool Parry();
+	/// <summary>
+	/// ドロップ処理（長押しカウント）
+	/// </summary>
+	bool Drop();
 
 	/// <summary>
 	/// カメラを追従させる
@@ -110,8 +126,10 @@ private: // ** 状態別関数 ** //
 	void UpdateParry(std::optional<State>&, const State&);
 	void InitFalling(const State&);
 	void UpdateFalling(std::optional<State>&, const State&);
-	void InitDropAttak(const State&);
-	void UpdateDropAttak(std::optional<State>&, const State&);
+	void InitDropStart(const State&);
+	void UpdateDropStart(std::optional<State>&, const State&);
+	void InitDropping(const State&);
+	void UpdateDropping(std::optional<State>&, const State&);
 #pragma endregion
 
 

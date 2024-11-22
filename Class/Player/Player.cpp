@@ -15,6 +15,7 @@ void Player::Init(LWP::Object::Camera* camera) {
 	model_.LoadShortPath("player/Player.gltf");
 	anim_.LoadFullPath("resources/model/player/Player.gltf", &model_);
 
+	// 当たり判定の設定
 	Collider::AABB& aabb1 = parryCollision_.SetBroadShape(Collider::AABB());
 	aabb1.min = { -0.3f, -0.5f, -0.5f };
 	aabb1.max = { 0.3f, 0.15f, 0.5f };
@@ -25,6 +26,16 @@ void Player::Init(LWP::Object::Camera* camera) {
 		Jump();	// 鉱石にヒットしていた場合 -> ジャンプ処理を行う
 		statePattern_.request = State::Jump;
 		parryCollision_.isActive = false;
+	};
+
+	Collider::AABB& aabb2 = dropCollision_.SetBroadShape(Collider::AABB());
+	aabb2.min = { -0.3f, -0.5f, -0.5f };
+	//aabb2.max = { 0.3f, 0.15f, 0.5f };
+	dropCollision_.mask.SetBelongFrag(KCMask::Drop());
+	dropCollision_.mask.SetHitFrag(KCMask::Ore());
+	dropCollision_.SetFollowTarget(&model_.worldTF);
+	dropCollision_.enterLambda = [this](Collision* c) {
+		c;	// いったん何もしない
 	};
 
 #pragma region 状態管理の関数登録
@@ -38,8 +49,10 @@ void Player::Init(LWP::Object::Camera* camera) {
 	statePattern_.updateFunction[GetInt(State::Parry)] = [this](std::optional<State>& req, const State& pre) { UpdateParry(req, pre); };
 	statePattern_.initFunction[GetInt(State::Falling)] = [this](const State& pre) { InitFalling(pre); };
 	statePattern_.updateFunction[GetInt(State::Falling)] = [this](std::optional<State>& req, const State& pre) { UpdateFalling(req, pre); };
-	statePattern_.initFunction[GetInt(State::DropAttak)] = [this](const State& pre) { InitDropAttak(pre); };
-	statePattern_.updateFunction[GetInt(State::DropAttak)] = [this](std::optional<State>& req, const State& pre) { UpdateDropAttak(req, pre); };
+	statePattern_.initFunction[GetInt(State::DropStart)] = [this](const State& pre) { InitDropStart(pre); };
+	statePattern_.updateFunction[GetInt(State::DropStart)] = [this](std::optional<State>& req, const State& pre) { UpdateDropStart(req, pre); };
+	statePattern_.initFunction[GetInt(State::Dropping)] = [this](const State& pre) { InitDropping(pre); };
+	statePattern_.updateFunction[GetInt(State::Dropping)] = [this](std::optional<State>& req, const State& pre) { UpdateDropping(req, pre); };
 #if DEMO
 	// 名前を登録しておく
 	statePattern_.name[GetInt(State::Idle)] = "Idle";
@@ -47,7 +60,9 @@ void Player::Init(LWP::Object::Camera* camera) {
 	statePattern_.name[GetInt(State::Jump)] = "Jump";
 	statePattern_.name[GetInt(State::Parry)] = "Parry";
 	statePattern_.name[GetInt(State::Falling)] = "Falling";
-	statePattern_.name[GetInt(State::DropAttak)] = "DropAttak";
+	statePattern_.name[GetInt(State::DropStart)] = "DropStart";
+	statePattern_.name[GetInt(State::Dropping)] = "Dropping";
+	
 #endif
 
 #pragma endregion
@@ -90,6 +105,9 @@ void Player::Update() {
 		ImGui::DragFloat("FieldBorder", &parameter_.kFieldBorder, 0.01f);
 		ImGui::TreePop();
 	}
+	ImGui::Text("VelocityY : %f", velocityY_);
+	ImGui::Text("ParryTime : %f", parryTime_);
+	ImGui::Text("DropInputTime : %f", dropInputTime_);
 	ImGui::End();
 #endif
 }
@@ -118,6 +136,21 @@ bool Player::Move() {
 bool Player::Parry() {
 	// スペースキーを押している場合にtrueを返す
 	return Keyboard::GetTrigger(DIK_SPACE);
+}
+bool Player::Drop() {
+	if (Keyboard::GetPress(DIK_SPACE)) {
+		dropInputTime_ += GetDeltaTimeF();	// 長押し秒数加算
+		// 長押しに必要な時間以上押した場合にtrueを返す
+		if (dropInputTime_ >= parameter_.kDropJudgeTime) {
+			dropInputTime_ = 0.0f;
+			return true;
+		}
+	}
+	else {
+		dropInputTime_ = 0.0f;	// 長押し秒数初期化
+	}
+
+	return false;
 }
 
 void Player::CameraMove() {
@@ -155,19 +188,26 @@ void Player::UpdateWalk(std::optional<State>& req, const State& pre) {
 	if (Jump()) { req = State::Jump; }
 }
 void Player::InitJump(const State& pre) {
-	if (pre == State::Parry) {
+	switch (pre) {
 		// 前がパリィ状態ならジャンプ力変更
-		velocityY_ = parameter_.kParryJumpPower;
-	}
-	else {
+		case Player::State::Parry:
+			velocityY_ = parameter_.kParryJumpPower;
+			break;
+		// 前がら落下状態ならジャンプ力変更
+		case Player::State::Dropping:
+			velocityY_ = parameter_.kDropEndJumpPower;
+			break;
 		// ジャンプ力を速度に付与
-		velocityY_ = parameter_.kJumpPower;
+		default:
+			velocityY_ = parameter_.kJumpPower;
+			break;
 	}
 }
 void Player::UpdateJump(std::optional<State>& req, const State& pre) {
 	Move();
 	velocityY_ -= parameter_.kGravity;	// 重力を加算
 	if (Parry()) { req = State::Parry; }
+	if (Drop()) { req = State::DropStart; }
 	if (velocityY_ < 0.0f) { req = State::Falling; }
 }
 void Player::InitParry(const State& pre) {
@@ -175,19 +215,38 @@ void Player::InitParry(const State& pre) {
 	parryCollision_.isActive = true;
 }
 void Player::UpdateParry(std::optional<State>& req, const State& pre) {
+	Move();
 	parryTime_ -= GetDeltaTimeF();
 	velocityY_ -= parameter_.kGravity;	// 重力を加算
 	if(parryTime_ < 0.0f) {	// 受付時間が経過したら終了
 		req = State::Falling;
 		parryCollision_.isActive = false;
 	}
+	if (Drop()) { req = State::DropStart; }
 }
 void Player::InitFalling(const State& pre){}
 void Player::UpdateFalling(std::optional<State>& req, const State& pre) {
 	Move();
 	velocityY_ -= parameter_.kGravity;	// 重力を加算
 	if (Parry()) { req = State::Parry; }
+	if (Drop()) { req = State::DropStart; }
 }
-void Player::InitDropAttak(const State& pre){}
-void Player::UpdateDropAttak(std::optional<State>& req, const State& pre){}
+void Player::InitDropStart(const State& pre){}
+void Player::UpdateDropStart(std::optional<State>& req, const State& pre) {
+	// アニメーションを再生し終わったら開始（今はアニメーションがないのでそのまま開始する）
+	req = State::Dropping;
+
+	dropCollision_.worldTF.scale;
+}
+void Player::InitDropping(const State& pre) {
+	// 落下速度固定
+	velocityY_ = -parameter_.kDropSpeed;
+}
+void Player::UpdateDropping(std::optional<State>& req, const State& pre) {
+	// もし地面についたら跳ねる
+	if (model_.worldTF.translation.y < 0.0f) {
+		model_.worldTF.translation.y = 0.0f;
+		req = State::Jump;
+	}
+}
 #pragma endregion

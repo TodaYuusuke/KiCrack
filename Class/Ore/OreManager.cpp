@@ -35,3 +35,13 @@ void OreManager::Init(int level) {
 void OreManager::Update() {
 
 };
+
+float OreManager::GetDropLevelBorder() {
+	float resultY = 0.0f;
+	for (IOre* o : ores_) {
+		Vector3 pos = o->GetWorldPosition();
+		resultY = std::max<float>(resultY, pos.y);	// 最大値を返す
+	}
+	
+	return resultY;
+}

@@ -16,13 +16,19 @@ public: // ** メンバ関数 ** //
 	/// </summary>
 	virtual void Update() = 0;
 
+	/// <summary>
+	/// ワールド座標を返す関数
+	/// </summary>
+	/// <returns>ワールド座標</returns>
+	LWP::Math::Vector3 GetWorldPosition() { return spawnPointModel_.worldTF.GetWorldPosition(); }
 
 protected: // ** メンバ変数 ** //
 
 	// 鉱石が生える地点を示すモデル
 	LWP::Resource::RigidModel spawnPointModel_;
 	// 鉱石自体のモデル
-	LWP::Resource::RigidModel model_[2];
+	LWP::Resource::RigidModel MaxHPModel_;
+	LWP::Resource::RigidModel LowHPModel_;
 	// コライダー
 	LWP::Object::Collision collision_;
 
