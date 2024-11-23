@@ -13,7 +13,10 @@ void Player::Init(LWP::Object::Camera* camera) {
 	cameraPtr_->worldTF.translation.z = parameter_.kCameraOffsetZ;
 
 	model_.LoadShortPath("player/Player.gltf");
+	model_.worldTF.rotation = Quaternion::CreateFromAxisAngle(Vector3::UnitY(), 1.57f);
+	model_.worldTF.scale = { 0.02f, 0.02f, 0.02f };
 	anim_.LoadFullPath("resources/model/player/Player.gltf", &model_);
+	anim_.playbackSpeed = 2.0f;
 
 	// 当たり判定の設定
 	Collider::AABB& aabb1 = parryCollision_.SetBroadShape(Collider::AABB());
@@ -123,7 +126,7 @@ bool Player::Move() {
 	if (!(pressA || pressD)) { return false; }
 	float x = 0.0f;	// 移動する向き
 	float& posX = model_.worldTF.translation.x;	// モデルの位置
-	
+
 	// キー入力
 	if (pressD) { x += 1.0f; }
 	if (pressA) { x -= 1.0f; }
@@ -132,6 +135,8 @@ bool Player::Move() {
 	posX += x * parameter_.kWalkSpeed;
 	// エリア外に行かないように調整
 	posX = std::clamp(posX, -parameter_.kFieldBorder, parameter_.kFieldBorder);
+	
+	return true;
 }
 bool Player::Parry() {
 	// スペースキーを押している場合にtrueを返す
@@ -177,17 +182,21 @@ void Player::GroundBorderCheck() {
 
 #pragma region 各状態初期化と更新
 void Player::InitIdle(const State& pre) {
+	anim_.Play("idle", true);
 }
 void Player::UpdateIdle(std::optional<State>& req, const State& pre) {
 	if (Move()) { req = State::Walk; }
 	if (Jump()) { req = State::Jump; }
 }
-void Player::InitWalk(const State& pre){}
+void Player::InitWalk(const State& pre) {
+	anim_.Play("walk", true);
+}
 void Player::UpdateWalk(std::optional<State>& req, const State& pre) {
 	if (!Move()) { req = State::Idle; }
 	if (Jump()) { req = State::Jump; }
 }
 void Player::InitJump(const State& pre) {
+	anim_.Play("jump");
 	switch (pre) {
 		// 前がパリィ状態ならジャンプ力変更
 		case Player::State::Parry:
@@ -211,6 +220,7 @@ void Player::UpdateJump(std::optional<State>& req, const State& pre) {
 	if (velocityY_ < 0.0f) { req = State::Falling; }
 }
 void Player::InitParry(const State& pre) {
+	anim_.Play("parry");
 	parryTime_ = parameter_.kParryReceptionTime;
 	parryCollision_.isActive = true;
 }
@@ -224,17 +234,23 @@ void Player::UpdateParry(std::optional<State>& req, const State& pre) {
 	}
 	if (Drop()) { req = State::DropStart; }
 }
-void Player::InitFalling(const State& pre){}
+void Player::InitFalling(const State& pre) {
+	anim_.Play("falling");
+}
 void Player::UpdateFalling(std::optional<State>& req, const State& pre) {
 	Move();
 	velocityY_ -= parameter_.kGravity;	// 重力を加算
 	if (Parry()) { req = State::Parry; }
 	if (Drop()) { req = State::DropStart; }
 }
-void Player::InitDropStart(const State& pre){}
+void Player::InitDropStart(const State& pre) {
+	anim_.Play("drop");
+}
 void Player::UpdateDropStart(std::optional<State>& req, const State& pre) {
 	// アニメーションを再生し終わったら開始（今はアニメーションがないのでそのまま開始する）
-	req = State::Dropping;
+	if (!anim_.GetPlaying("drop")) {
+		req = State::Dropping;
+	}
 
 	dropCollision_.worldTF.scale;
 }
