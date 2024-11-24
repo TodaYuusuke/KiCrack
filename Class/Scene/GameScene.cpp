@@ -11,7 +11,7 @@ using namespace LWP::Info;
 // 初期化
 void GameScene::Initialize() {
 	player_.Init(&mainCamera);
-	stageManager_.Init();
+	stageManager_.Init(&mainCamera);
 	player_.SetDropLevelBorder(stageManager_.GetDropLevelBorder());	// 落下攻撃レベルボーダー設定
 }
 

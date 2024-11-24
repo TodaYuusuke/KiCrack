@@ -9,14 +9,9 @@ class StageManager final {
 public: // ** メンバ関数 ** //
 
 	/// <summary>
-	/// コンストラクタ
-	/// </summary>
-	StageManager();
-
-	/// <summary>
 	/// 初期化
 	/// </summary>
-	void Init();
+	void Init(LWP::Object::Camera* camera);
 	/// <summary>
 	/// 更新
 	/// </summary>
@@ -44,5 +39,5 @@ private: // ** メンバ変数 ** //
 	// 鉱石管理クラス
 	OreManager oreManager_;
 
-	int currentStageLevel = 1;
+	int currentStageLevel = 4;
 };

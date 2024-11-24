@@ -131,12 +131,8 @@ void Player::StageStart() {
 }
 
 bool Player::GetNextStageFlag() {
-	// ある程度下層にたどり着いたら
-	if (model_.worldTF.translation.y < -15.0f) {
-		return true;
-	}
-
-	return false;
+	// ある程度下層にたどり着いたらならクリア判定を出す
+	return model_.worldTF.translation.y < -15.0f;
 }
 
 

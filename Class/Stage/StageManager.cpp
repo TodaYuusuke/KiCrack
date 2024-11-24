@@ -1,13 +1,13 @@
 #include "StageManager.h"
 
-StageManager::StageManager() {
-	field_.Init();
-}
+using namespace LWP::Object;
 
-void StageManager::Init() {
+void StageManager::Init(Camera* camera) {
+	field_.Init(camera);
 	oreManager_.Init(currentStageLevel);
 }
 void StageManager::Update() {
+	field_.Update();
 	oreManager_.Update();
 
 	// クリアしたら床の当たり判定を消す
@@ -20,7 +20,7 @@ bool StageManager::NextStage() {
 	if (currentStageLevel > 10) {
 		return false;	// 次のステージへいけなかったのでfalseを返す
 	}
-	Init();	// 初期化
+	oreManager_.Init(currentStageLevel);	// 鉱石初期化
 	return true;
 }
 

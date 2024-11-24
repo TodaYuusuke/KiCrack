@@ -28,6 +28,7 @@ public: // ** メンバ関数 ** //
 	/// <returns>ワールド座標</returns>
 	LWP::Math::Vector3 GetWorldPosition() { return spawnPointModel_.worldTF.GetWorldPosition(); }
 
+
 protected: // ** メンバ変数 ** //
 
 	// 鉱石が生える地点を示すモデル
@@ -56,4 +57,12 @@ protected: // ** メンバ変数 ** //
 
 	// この鉱石のスコア
 	int score_ = 1;
+
+
+protected: // ** メンバ関数 ** //
+
+	/// <summary>
+	/// リスポーン時の処理
+	/// </summary>
+	virtual void Respawn();
 };

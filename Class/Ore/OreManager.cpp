@@ -31,7 +31,34 @@ void OreManager::Init(int level) {
 		// リメイク元のCSVをそのまま使用するためにここで座標変換を行う
 		pos.x = (pos.x - kStageWidthHalf) / (kStageWidthHalf / kStageSizeMultiply);
 		pos.y = (pos.y - kStageHeight) / kStageHeightReducing;
-		IOre* o = new Normal();
+
+		// 鉱石の種類決定
+		IOre* o = nullptr;
+		switch (static_cast<OreType>(std::stoi(strvec[2]))) {
+			case OreManager::OreType::Normal:
+				o = new Normal();
+				break;
+			case OreManager::OreType::Weak:
+				o = new Weak();
+				break;
+			case OreManager::OreType::Explosive:
+				// リメイク前の未実装部分（CSVの値を書き換えるのが面倒なのでそのまま）
+				o = new Normal();
+				break;
+			case OreManager::OreType::HorizontalMove_LeftStart:
+				o = new Normal();
+				break;
+			case OreManager::OreType::HorizontalMove_RightStart:
+				o = new Normal();
+				break;
+			case OreManager::OreType::VerticalMove_DownStart:
+				o = new Normal();
+				break;
+			case OreManager::OreType::VerticalMove_UpStart:
+				o = new Normal();
+				break;
+		}
+
 		o->Init(pos, &quota_);
 		ores_.push_back(o);
 

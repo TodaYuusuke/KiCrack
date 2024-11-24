@@ -1,5 +1,6 @@
 #pragma once
-#include "Normal.h"
+#include "Child/Normal.h"
+#include "Child/Weak.h"
 
 /// <summary>
 /// 鉱石管理クラス
@@ -40,4 +41,16 @@ private: // ** メンバ変数 ** //
 
 	// 鉱石たちの中で最大の高さ
 	float highestY_ = 0.0f;
+
+
+	// ブロックの種類
+	enum class OreType {
+		Normal,
+		Weak,
+		Explosive,
+		HorizontalMove_LeftStart,
+		HorizontalMove_RightStart,
+		VerticalMove_DownStart,
+		VerticalMove_UpStart,
+	};
 };

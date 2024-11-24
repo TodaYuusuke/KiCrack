@@ -1,5 +1,5 @@
 #pragma once
-#include "IOre.h"
+#include "../IOre.h"
 
 /// <summary>
 /// 通常の鉱石

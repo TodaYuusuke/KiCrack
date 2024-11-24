@@ -24,6 +24,7 @@ void IOre::Init(LWP::Math::Vector2 pos, int* quota) {
 	MaxHPModel_.worldTF.scale = { 0.3f,0.3f, 0.3f };
 	LowHPModel_.LoadShortPath("stage/ore/Crystal_Small.gltf");
 	LowHPModel_.worldTF.Parent(&MaxHPModel_.worldTF);
+	LowHPModel_.isActive = false;
 
 	// 鉱石に追従するカメラ
 	collision_.SetFollowTarget(&MaxHPModel_.worldTF);
@@ -59,6 +60,7 @@ void IOre::Init(LWP::Math::Vector2 pos, int* quota) {
 	aabb.min = { -0.25f, -0.25f, -0.56f };
 	aabb.max = { 0.25f, 0.25f, 0.0f };
 	
+	hp_ = parameter_.kMaxHP;
 };
 
 void IOre::Update() {
@@ -67,10 +69,16 @@ void IOre::Update() {
 		respawnTime_ -= GetDeltaTimeF();
 		// 残り0秒以下になったらリスポーン
 		if (respawnTime_ <= 0.0f) {
-			hp_ = parameter_.kMaxHP;
-			// モデルとコライダーをtrueに
-			MaxHPModel_.isActive = true;
-			collision_.isActive = true;
+			Respawn();
 		}
 	}
+}
+
+void IOre::Respawn() {
+	// 体力を回復させる
+	hp_ = parameter_.kMaxHP;
+	// モデルとコライダーをtrueに
+	MaxHPModel_.isActive = true;
+	LowHPModel_.isActive = false;
+	collision_.isActive = true;
 }
