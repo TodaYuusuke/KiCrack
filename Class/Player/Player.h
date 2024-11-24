@@ -17,10 +17,25 @@ public: // ** メンバ関数 ** //
 	void Update();
 
 	/// <summary>
+	/// ステージ開始時に呼び出される処理
+	/// </summary>
+	void StageStart();
+
+	/// <summary>
 	/// 落下攻撃のレベルボーダーを設定
 	/// </summary>
 	/// <param name="y"></param>
 	void SetDropLevelBorder(float y) { dropLevelMaxHeight_ = y; }
+	/// <summary>
+	/// ステージクリア判定のフラグをセット
+	/// </summary>
+	/// <param name="b"></param>
+	void SetStageClearFlag(bool b) { stageClearFlag_ = b; }
+
+	/// <summary>
+	/// 次のステージへ行くかのフラグを返す（ある程度0より下の座標についた場合に次のステージへ）
+	/// </summary>
+	bool GetNextStageFlag();
 
 
 private: // ** メンバ変数 ** //
@@ -85,6 +100,8 @@ private: // ** メンバ変数 ** //
 	float velocityY_ = 0.0f;
 	// ヒットストップ時間
 	float hitStop_ = 0.0f;
+	// 床のコライダーフラグ
+	bool stageClearFlag_ = false;
 
 	// パリィの残り時間
 	float parryTime_ = 0.0f;

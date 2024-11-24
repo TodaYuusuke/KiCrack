@@ -13,6 +13,11 @@ public: // ** メンバ関数 ** //
 	void Init();
 
 	/// <summary>
+	/// 床のフラグ切り替え
+	/// </summary>
+	/// <param name="level"></param>
+	void ChangeFloorFlag(bool  b) { floor.isActive = b; }
+	/// <summary>
 	/// 床のテクスチャ変更
 	/// </summary>
 	void ChangeFloorTexture(int level);

@@ -155,7 +155,6 @@
     <ClCompile Include="Class\Scene\GameScene.cpp" />
     <ClCompile Include="Class\Scene\Title.cpp" />
     <ClCompile Include="Class\Stage\Field.cpp" />
-    <ClCompile Include="Class\Stage\Quota.cpp" />
     <ClCompile Include="Class\Stage\StageManager.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
@@ -168,7 +167,6 @@
     <ClInclude Include="Class\Scene\GameScene.h" />
     <ClInclude Include="Class\Scene\Title.h" />
     <ClInclude Include="Class\Stage\Field.h" />
-    <ClInclude Include="Class\Stage\Quota.h" />
     <ClInclude Include="Class\Stage\StageManager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

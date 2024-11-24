@@ -19,4 +19,16 @@ void GameScene::Initialize() {
 void GameScene::Update() {
 	player_.Update();
 	stageManager_.Update();
+
+	// ステージをクリアしたら床のコリジョンをオフにする
+	player_.SetStageClearFlag(stageManager_.GetIsClear());
+
+	// プレイヤーがある程度下層まで到達したら次のステージへ
+	if (player_.GetNextStageFlag()) {
+		// 次のステージへいけなかった場合はゲームクリアなので終了
+		if (!stageManager_.NextStage()) {}
+		// 初期設定
+		player_.SetDropLevelBorder(stageManager_.GetDropLevelBorder());	// 落下攻撃レベルボーダー設定
+		player_.StageStart();	// ステージ開始時に必要な処理をまとめた関数を呼び出す
+	}
 }

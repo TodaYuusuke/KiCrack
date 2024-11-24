@@ -9,6 +9,11 @@ class StageManager final {
 public: // ** メンバ関数 ** //
 
 	/// <summary>
+	/// コンストラクタ
+	/// </summary>
+	StageManager();
+
+	/// <summary>
 	/// 初期化
 	/// </summary>
 	void Init();
@@ -18,10 +23,19 @@ public: // ** メンバ関数 ** //
 	void Update();
 
 	/// <summary>
+	/// 次のステージへ
+	/// </summary>
+	bool NextStage();
+
+	/// <summary>
 	/// 落下攻撃用の鉱石最大地点を返す関数
 	/// </summary>
 	float GetDropLevelBorder();
-
+	/// <summary>
+	/// ステージをクリアしたかどうか返す
+	/// </summary>
+	/// <returns></returns>
+	bool GetIsClear();
 
 private: // ** メンバ変数 ** //
 
@@ -29,4 +43,6 @@ private: // ** メンバ変数 ** //
 	Field field_;
 	// 鉱石管理クラス
 	OreManager oreManager_;
+
+	int currentStageLevel = 1;
 };

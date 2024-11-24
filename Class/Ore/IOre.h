@@ -10,7 +10,7 @@ public: // ** メンバ関数 ** //
 	/// <summary>
 	/// 初期化
 	/// </summary>
-	virtual void Init(LWP::Math::Vector2 pos);
+	virtual void Init(LWP::Math::Vector2 pos, int* quota);
 	/// <summary>
 	/// 更新
 	/// </summary>

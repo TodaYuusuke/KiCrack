@@ -4,6 +4,10 @@ using namespace LWP::Math;
 using namespace LWP::Utility;
 
 void OreManager::Init(int level) {
+	// 鉱石クリア
+	for (IOre* o : ores_) { delete o; }
+	ores_.clear();
+
 	const float kStageWidth = 950.0f;	// リメイク元のステージの幅
 	const float kStageWidthHalf = kStageWidth / 2.0f;
 	const float kStageSizeMultiply = 5.0f;	// 今回のステージの幅
@@ -15,6 +19,12 @@ void OreManager::Init(int level) {
 	std::string line;
 	while (std::getline(ifs, line)) {
 		std::vector<std::string> strvec = Split(line, ',');
+		// 最後の行はノルマしか書かれていないので特殊な処理
+		if (strvec.size() <= 1) {
+			quota_ = std::stof(strvec[0]);
+			break;
+		}
+
 		Vector2 pos;
 		pos.x = std::stof(strvec[0]);
 		pos.y = std::stof(strvec[1]);
@@ -22,7 +32,7 @@ void OreManager::Init(int level) {
 		pos.x = (pos.x - kStageWidthHalf) / (kStageWidthHalf / kStageSizeMultiply);
 		pos.y = (pos.y - kStageHeight) / kStageHeightReducing;
 		IOre* o = new Normal();
-		o->Init(pos);
+		o->Init(pos, &quota_);
 		ores_.push_back(o);
 
 		// 一番高い位置を求める

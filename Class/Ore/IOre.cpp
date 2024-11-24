@@ -9,7 +9,7 @@ using namespace LWP::Object;
 using namespace LWP::Utility;
 using namespace LWP::Info;
 
-void IOre::Init(LWP::Math::Vector2 pos) {
+void IOre::Init(LWP::Math::Vector2 pos, int* quota) {
 	spawnPointModel_.LoadShortPath("stage/ore/Block_Crystal.gltf");
 	spawnPointModel_.worldTF.translation.x = pos.x;
 	spawnPointModel_.worldTF.translation.y = pos.y;
@@ -29,7 +29,7 @@ void IOre::Init(LWP::Math::Vector2 pos) {
 	collision_.SetFollowTarget(&MaxHPModel_.worldTF);
 	collision_.mask.SetBelongFrag(KCMask::Ore());
 	collision_.mask.SetHitFrag(KCMask::Parry() | KCMask::Drop());
-	collision_.enterLambda = [this](Collision* c) {
+	collision_.enterLambda = [this, quota](Collision* c) {
 		// パリィ所属のコライダーにヒットした場合
 		if (c->mask.GetBelongFrag() & KCMask::Parry()) {
 			// 体力を攻撃力分減らす
@@ -52,6 +52,7 @@ void IOre::Init(LWP::Math::Vector2 pos) {
 			LowHPModel_.isActive = false;
 			collision_.isActive = false;
 			respawnTime_ = parameter_.kRespawnTime;	// リスポーンタイマー初期化
+			*quota -= score_;
 		}
 	};
 	Collider::AABB& aabb = collision_.SetBroadShape(Collider::AABB());

@@ -31,6 +31,7 @@ void Player::Init(LWP::Object::Camera* camera) {
 		statePattern_.request = State::Jump;
 		parryCollision_.isActive = false;
 	};
+	parryCollision_.isActive = false;	// コライダーを無効化
 
 	dropAABB_ = &dropCollision_.SetBroadShape(Collider::AABB());
 	dropAABB_->min = parameter_.kDropSizeMin;
@@ -125,6 +126,20 @@ void Player::Update() {
 	CameraMove();
 }
 
+void Player::StageStart() {
+	model_.worldTF.translation.y += 25.0f + dropLevelMaxHeight_;
+}
+
+bool Player::GetNextStageFlag() {
+	// ある程度下層にたどり着いたら
+	if (model_.worldTF.translation.y < -15.0f) {
+		return true;
+	}
+
+	return false;
+}
+
+
 bool Player::Jump() {
 	// スペースキーを押している場合にtrueを返す
 	return Keyboard::GetTrigger(DIK_SPACE);
@@ -178,10 +193,16 @@ void Player::CameraMove() {
 		cameraPtr_->worldTF.translation.y += distance + parameter_.kCameraDistance;
 	}
 
-	// 地面の下を貫通しないようにカメラを調整
-	cameraPtr_->worldTF.translation.y = std::max<float>(cameraPtr_->worldTF.translation.y, parameter_.kCameraMinBorderY);
+	// ステージクリアしている場合はこの処理を行わない
+	if (!stageClearFlag_) {
+		// 地面の下を貫通しないようにカメラを調整
+		cameraPtr_->worldTF.translation.y = std::max<float>(cameraPtr_->worldTF.translation.y, parameter_.kCameraMinBorderY);
+	}
 }
 bool Player::GroundBorderCheck() {
+	// もしノルマクリアによって床の判定が消えた場合 -> チェックしない
+	if (stageClearFlag_) { return false; }
+
 	if (model_.worldTF.translation.y < 0.0f) {
 		model_.worldTF.translation.y = 0.0f;
 		velocityY_ = 0.0f;
@@ -287,7 +308,7 @@ void Player::InitDropping(const State& pre) {
 }
 void Player::UpdateDropping(std::optional<State>& req, const State& pre) {
 	// もし地面についたら跳ねる
-	if (GroundBorderCheck()) {
+   	if (GroundBorderCheck()) {
 		model_.worldTF.translation.y = 0.0f;
 		req = State::Jump;
 		dropCollision_.isActive = false;	// コライダーを無効化
