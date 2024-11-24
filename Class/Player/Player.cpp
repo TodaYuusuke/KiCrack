@@ -122,6 +122,7 @@ void Player::Update() {
 	else { hitStop_ = 0.0f; }
 
 	statePattern_.Update();
+	velocityY_ = std::max<float>(velocityY_, parameter_.kFallMaxSpeed);	// ある程度以上の落下速度にならないように設定
 	model_.worldTF.translation.y += velocityY_;
 	CameraMove();
 }
@@ -214,6 +215,7 @@ bool Player::GroundBorderCheck() {
 #pragma region 各状態初期化と更新
 void Player::InitIdle(const State& pre) {
 	anim_.Play("idle", true);
+	parryCollision_.isActive = false;
 }
 void Player::UpdateIdle(std::optional<State>& req, const State& pre) {
 	if (Move()) { req = State::Walk; }

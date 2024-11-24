@@ -24,7 +24,7 @@ public: // ** メンバ関数 ** //
 	/// <summary>
 	/// 床のテクスチャ変更
 	/// </summary>
-	void ChangeFloorTexture(int level);
+	//void ChangeFloorTexture(int level);
 
 
 private: // ** メンバ定数 ** //

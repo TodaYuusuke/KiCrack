@@ -49,7 +49,7 @@ private: // ** メンバ変数 ** //
 		float kWalkSpeed = 0.05f;	// 横移動速度
 		float kJumpPower = 0.12f;		// 通常ジャンプ力
 		float kGravity = 9.8f / 60.0f / 40.0f;			// 重力の強さ
-		float kFallMaxSpeed;	// 自然落下の速度制限
+		float kFallMaxSpeed = -0.33f;	// 自然落下の速度制限
 
 		float kParryJumpPower = kJumpPower * 1.25f;	// パリィジャンプ力
 		LWP::Math::Vector3 kParrySizeMin = { -0.3f, -0.5f, -0.5f };	// パリィの当たり判定サイズ

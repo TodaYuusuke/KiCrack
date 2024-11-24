@@ -1,6 +1,10 @@
 #pragma once
 #include "Child/Normal.h"
 #include "Child/Weak.h"
+#include "Child/MoveHN_L.h"
+#include "Child/MoveHN_R.h"
+#include "Child/MoveVT_D.h"
+#include "Child/MoveVT_U.h"
 
 /// <summary>
 /// 鉱石管理クラス
