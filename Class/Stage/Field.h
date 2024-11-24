@@ -43,6 +43,8 @@ private: // ** メンバ変数 ** //
 
 	// 壁のモデル
 	LWP::Resource::RigidModel wall[3];
+	LWP::Object::Collision wallCollision_[3];	// 当たり判定
 	// 床のモデル
 	LWP::Resource::RigidModel floor;
+	LWP::Object::Collision floorCollision_;	// 当たり判定
 };
