@@ -21,27 +21,29 @@ void OreManager::Init(int level) {
 		// リメイク元のCSVをそのまま使用するためにここで座標変換を行う
 		pos.x = (pos.x - kStageWidthHalf) / (kStageWidthHalf / kStageSizeMultiply);
 		pos.y = (pos.y - kStageHeight) / kStageHeightReducing;
+		IOre* o = new Normal();
+		o->Init(pos);
+		ores_.push_back(o);
 
-		ores_.push_back(new Normal(pos));
+		// 一番高い位置を求める
+		highestY_ = std::max<float>(highestY_, pos.y);	// 最大値を返す
 	}
 
-	//ores_.push_back(new Normal({ -1.0f, 1.0f }));
-	//ores_.push_back(new Normal({ -2.0f, 1.0f }));
-	//ores_.push_back(new Normal({ -1.5f, 2.0f }));
-	//ores_.push_back(new Normal({ 1.0f, 1.0f }));
-	//ores_.push_back(new Normal({ 2.0f, 1.0f }));
-	//ores_.push_back(new Normal({ 1.5f, 2.0f }));
+	// スコアを付与する
+	for (IOre* o : ores_) {
+		float y = o->GetWorldPosition().y;
+		o->SetScore(OreManager::GetHeightLevel(y, highestY_));
+	}
 }
 void OreManager::Update() {
-
+	for (IOre* o : ores_) { o->Update(); }
 };
 
-float OreManager::GetDropLevelBorder() {
-	float resultY = 0.0f;
-	for (IOre* o : ores_) {
-		Vector3 pos = o->GetWorldPosition();
-		resultY = std::max<float>(resultY, pos.y);	// 最大値を返す
-	}
+int OreManager::GetHeightLevel(float y, float highestY) {
+	// 0除算を回避
+	if (y <= 0) { return 1; }
 	
-	return resultY;
+	float unit = highestY / 3.0f;
+	int level = static_cast<int>((y / unit)) + 1;
+	return std::min<int>(level, 4);	// 3レベル以上にはしない
 }

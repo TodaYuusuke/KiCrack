@@ -36,16 +36,22 @@ private: // ** メンバ変数 ** //
 		float kGravity = 9.8f / 60.0f / 40.0f;			// 重力の強さ
 		float kFallMaxSpeed;	// 自然落下の速度制限
 
-		float kParryJumpPower = kJumpPower * 1.3f;	// パリィジャンプ力
+		float kParryJumpPower = kJumpPower * 1.25f;	// パリィジャンプ力
+		LWP::Math::Vector3 kParrySizeMin = { -0.3f, -0.5f, -0.5f };	// パリィの当たり判定サイズ
+		LWP::Math::Vector3 kParrySizeMax = { 0.3f, 0.15f, 0.5f };
 		float kParryReceptionTime = 0.3f;		// パリィの判定時間
 
 		float kDropSpeed = 0.3f;		// ドロップ速度
-		float kDropEndJumpPower = 0.3f;		// ドロップ速度
+		LWP::Math::Vector3 kDropSizeMin = kParrySizeMin;	// ドロップの当たり判定サイズ
+		LWP::Math::Vector3 kDropSizeMax = kParrySizeMax;
+		float kDropLevelMultiply = 2.3f;	// ドロップ攻撃のレベルごとの倍率
+		float kDropEndJumpPower = kJumpPower * 0.4f;	// ドロップ終了時のジャンプ力
 		float kDropJudgeTime = 0.4f;	// 長押し判定に必要な秒数
 
 		float kCameraOffsetZ = -25.0f;	// カメラの距離
 		float kCameraMinBorderY = 3.5f;	// カメラの最低Y座標
 		float kCameraDistance = 0.1f;	// カメラとプレイヤーの離れてはいけない距離
+		float kHitStopTime = 0.03f;	// ヒットストップ時間
 		float kFieldBorder = 5.0f;	// ステージのボーダー
 	}parameter_;
 
@@ -77,12 +83,17 @@ private: // ** メンバ変数 ** //
 
 	// Y軸の速度
 	float velocityY_ = 0.0f;
+	// ヒットストップ時間
+	float hitStop_ = 0.0f;
+
 	// パリィの残り時間
 	float parryTime_ = 0.0f;
 	// 落下攻撃までの入力時間
 	float dropInputTime_ = 0.0f;
 	// 落下攻撃のレベル判定用の高さ
 	float dropLevelMaxHeight_ = 0.0f;
+	// 落下攻撃の当たり判定のポインタ
+	LWP::Object::Collider::AABB* dropAABB_;
 
 private: // ** プライベートなメンバ関数 ** //
 
@@ -111,7 +122,7 @@ private: // ** プライベートなメンバ関数 ** //
 	/// <summary>
 	/// 地面を貫通しないかチェックする関数
 	/// </summary>
-	void GroundBorderCheck();
+	bool GroundBorderCheck();
 
 
 #pragma region 各状態初期化と更新

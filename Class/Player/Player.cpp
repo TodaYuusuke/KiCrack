@@ -1,5 +1,6 @@
 #include "Player.h"
 #include "Mask.h"
+#include "Ore/OreManager.h"
 
 using namespace LWP::Input;
 using namespace LWP::Object;
@@ -20,8 +21,8 @@ void Player::Init(LWP::Object::Camera* camera) {
 
 	// 当たり判定の設定
 	Collider::AABB& aabb1 = parryCollision_.SetBroadShape(Collider::AABB());
-	aabb1.min = { -0.3f, -0.5f, -0.5f };
-	aabb1.max = { 0.3f, 0.15f, 0.5f };
+	aabb1.min = parameter_.kParrySizeMin;
+	aabb1.max = parameter_.kParrySizeMax;
 	parryCollision_.mask.SetBelongFrag(KCMask::Parry());
 	parryCollision_.mask.SetHitFrag(KCMask::Ore());
 	parryCollision_.SetFollowTarget(&model_.worldTF);
@@ -31,15 +32,18 @@ void Player::Init(LWP::Object::Camera* camera) {
 		parryCollision_.isActive = false;
 	};
 
-	Collider::AABB& aabb2 = dropCollision_.SetBroadShape(Collider::AABB());
-	aabb2.min = { -0.3f, -0.5f, -0.5f };
-	//aabb2.max = { 0.3f, 0.15f, 0.5f };
+	dropAABB_ = &dropCollision_.SetBroadShape(Collider::AABB());
+	dropAABB_->min = parameter_.kDropSizeMin;
+	dropAABB_->max = parameter_.kDropSizeMax;
 	dropCollision_.mask.SetBelongFrag(KCMask::Drop());
 	dropCollision_.mask.SetHitFrag(KCMask::Ore());
 	dropCollision_.SetFollowTarget(&model_.worldTF);
 	dropCollision_.enterLambda = [this](Collision* c) {
 		c;	// いったん何もしない
+		// ヒットストップ発動
+		hitStop_ = parameter_.kHitStopTime;
 	};
+	dropCollision_.isActive = false;	// コライダーを無効化
 
 #pragma region 状態管理の関数登録
 	statePattern_.initFunction[GetInt(State::Idle)] = [this](const State& pre) { InitIdle(pre); };
@@ -71,11 +75,6 @@ void Player::Init(LWP::Object::Camera* camera) {
 #pragma endregion
 }
 void Player::Update() {
-	statePattern_.Update();
-	model_.worldTF.translation.y += velocityY_;
-	GroundBorderCheck();
-	CameraMove();
-
 #if DEMO
 	ImGui::Begin("Player");
 	if (ImGui::TreeNode("Model")) {
@@ -100,11 +99,13 @@ void Player::Update() {
 		ImGui::DragFloat("ParryJumpPower", &parameter_.kParryJumpPower, 0.01f);
 		ImGui::Text("Drop");
 		ImGui::DragFloat("DropSpeed", &parameter_.kDropSpeed, 0.01f);
+		ImGui::DragFloat("kDropEndJumpPower", &parameter_.kDropEndJumpPower, 0.01f);
 		ImGui::DragFloat("DropJudgeTime", &parameter_.kDropJudgeTime, 0.01f);
 		ImGui::Text("Other");
 		ImGui::DragFloat("CameraOffsetZ", &parameter_.kCameraOffsetZ, 0.01f);
 		ImGui::DragFloat("kCameraMinBorderY", &parameter_.kCameraMinBorderY, 0.01f);
 		ImGui::DragFloat("kCameraDistance", &parameter_.kCameraDistance, 0.01f);
+		ImGui::DragFloat("kHitStopTime", &parameter_.kHitStopTime, 0.01f);
 		ImGui::DragFloat("FieldBorder", &parameter_.kFieldBorder, 0.01f);
 		ImGui::TreePop();
 	}
@@ -113,6 +114,15 @@ void Player::Update() {
 	ImGui::Text("DropInputTime : %f", dropInputTime_);
 	ImGui::End();
 #endif
+
+	// ヒットストップ中は早期リターン
+	hitStop_ -= GetDeltaTimeF();
+	if (hitStop_ > 0.0f) { return; }
+	else { hitStop_ = 0.0f; }
+
+	statePattern_.Update();
+	model_.worldTF.translation.y += velocityY_;
+	CameraMove();
 }
 
 bool Player::Jump() {
@@ -171,12 +181,16 @@ void Player::CameraMove() {
 	// 地面の下を貫通しないようにカメラを調整
 	cameraPtr_->worldTF.translation.y = std::max<float>(cameraPtr_->worldTF.translation.y, parameter_.kCameraMinBorderY);
 }
-void Player::GroundBorderCheck() {
+bool Player::GroundBorderCheck() {
 	if (model_.worldTF.translation.y < 0.0f) {
 		model_.worldTF.translation.y = 0.0f;
 		velocityY_ = 0.0f;
-		statePattern_.request = State::Idle;
+		if (statePattern_.request == std::nullopt) {	// リクエストがなにもなければIdleにする
+			statePattern_.request = State::Idle;
+		}
+		return true;
 	}
+	return false;
 }
 
 
@@ -218,6 +232,7 @@ void Player::UpdateJump(std::optional<State>& req, const State& pre) {
 	if (Parry()) { req = State::Parry; }
 	if (Drop()) { req = State::DropStart; }
 	if (velocityY_ < 0.0f) { req = State::Falling; }
+	GroundBorderCheck();
 }
 void Player::InitParry(const State& pre) {
 	anim_.Play("parry");
@@ -233,6 +248,7 @@ void Player::UpdateParry(std::optional<State>& req, const State& pre) {
 		parryCollision_.isActive = false;
 	}
 	if (Drop()) { req = State::DropStart; }
+	GroundBorderCheck();
 }
 void Player::InitFalling(const State& pre) {
 	anim_.Play("falling");
@@ -242,27 +258,39 @@ void Player::UpdateFalling(std::optional<State>& req, const State& pre) {
 	velocityY_ -= parameter_.kGravity;	// 重力を加算
 	if (Parry()) { req = State::Parry; }
 	if (Drop()) { req = State::DropStart; }
+	GroundBorderCheck();
 }
 void Player::InitDropStart(const State& pre) {
 	anim_.Play("drop");
+	velocityY_ *= 0.2f;	// 速度を急激に落とす
 }
 void Player::UpdateDropStart(std::optional<State>& req, const State& pre) {
-	// アニメーションを再生し終わったら開始（今はアニメーションがないのでそのまま開始する）
+	// アニメーションを再生し終わったら開始
 	if (!anim_.GetPlaying("drop")) {
 		req = State::Dropping;
+		dropAABB_->min = parameter_.kDropSizeMin;
+		dropAABB_->max = parameter_.kDropSizeMax;
+		// 落下攻撃のレベルを設定
+     	float level = static_cast<float>(OreManager::GetHeightLevel(model_.worldTF.translation.y, dropLevelMaxHeight_)) - 1;
+		// レベル0以上ならサイズに倍率をかける
+		if (level > 0) {
+			dropAABB_->min.x *= level * parameter_.kDropLevelMultiply;
+			dropAABB_->max.x *= level * parameter_.kDropLevelMultiply;
+		}
 	}
-
-	dropCollision_.worldTF.scale;
+	GroundBorderCheck();
 }
 void Player::InitDropping(const State& pre) {
 	// 落下速度固定
 	velocityY_ = -parameter_.kDropSpeed;
+	dropCollision_.isActive = true;	// コライダーを有効化
 }
 void Player::UpdateDropping(std::optional<State>& req, const State& pre) {
 	// もし地面についたら跳ねる
-	if (model_.worldTF.translation.y < 0.0f) {
+	if (GroundBorderCheck()) {
 		model_.worldTF.translation.y = 0.0f;
 		req = State::Jump;
+		dropCollision_.isActive = false;	// コライダーを無効化
 	}
 }
 #pragma endregion

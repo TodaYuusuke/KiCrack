@@ -14,7 +14,13 @@ public: // ** メンバ関数 ** //
 	/// <summary>
 	/// 更新
 	/// </summary>
-	virtual void Update() = 0;
+	virtual void Update();
+
+	/// <summary>
+	/// この鉱石を破壊したときのスコアを設定する
+	/// </summary>
+	/// <param name="s"></param>
+	void SetScore(int s) { score_ = s; }
 
 	/// <summary>
 	/// ワールド座標を返す関数
@@ -37,12 +43,17 @@ protected: // ** メンバ変数 ** //
 	/// </summary>
 	struct Parameter {
 		float kCollisionScale = 1.0f;	// 当たり判定スケール
-		int kMaxHealth = 2;			// 最大体力
+		int kMaxHP = 2;			// 最大体力
 		float kRespawnTime = 3.0f;		// リポップ時間
 
 		float kMoveSpeed = 0.0f;		// 移動速度
 	}parameter_;
 
 	// 体力
-	int hp_ = parameter_.kMaxHealth;
+	int hp_ = parameter_.kMaxHP;
+	// リスポーンまでの時間
+	float respawnTime_ = 0.0f;
+
+	// この鉱石のスコア
+	int score_ = 1;
 };

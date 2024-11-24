@@ -7,6 +7,7 @@
 using namespace LWP::Math;
 using namespace LWP::Object;
 using namespace LWP::Utility;
+using namespace LWP::Info;
 
 void IOre::Init(LWP::Math::Vector2 pos) {
 	spawnPointModel_.LoadShortPath("stage/ore/Block_Crystal.gltf");
@@ -35,7 +36,7 @@ void IOre::Init(LWP::Math::Vector2 pos) {
 			hp_ -= Player::kParryPower;
 		}
 		// ドロップ所属のコライダーにヒットした場合
-		else if (c->mask.GetBelongFrag() & KCMask::Parry()) {
+		else if (c->mask.GetBelongFrag() & KCMask::Drop()) {
 			// 体力を攻撃力分減らす
 			hp_ -= Player::kDropPower;
 		}
@@ -47,12 +48,28 @@ void IOre::Init(LWP::Math::Vector2 pos) {
 		}
 		// 体力が0以下になった場合 -> モデル消失
 		else if (hp_ <= 0) {
+			MaxHPModel_.isActive = false;
 			LowHPModel_.isActive = false;
 			collision_.isActive = false;
+			respawnTime_ = parameter_.kRespawnTime;	// リスポーンタイマー初期化
 		}
 	};
 	Collider::AABB& aabb = collision_.SetBroadShape(Collider::AABB());
 	aabb.min = { -0.25f, -0.25f, -0.56f };
 	aabb.max = { 0.25f, 0.25f, 0.0f };
-	//aabb.Create(model_);
+	
 };
+
+void IOre::Update() {
+	// 体力が0になっていたらリスポーンタイマー更新
+	if (hp_ <= 0) {
+		respawnTime_ -= GetDeltaTimeF();
+		// 残り0秒以下になったらリスポーン
+		if (respawnTime_ <= 0.0f) {
+			hp_ = parameter_.kMaxHP;
+			// モデルとコライダーをtrueに
+			MaxHPModel_.isActive = true;
+			collision_.isActive = true;
+		}
+	}
+}
