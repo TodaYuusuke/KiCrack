@@ -57,6 +57,16 @@ private: // ** メンバ変数 ** //
 
 	// レベルアップボーダー表示
 	LWP::Primitive::Surface sprite3D_[3];
+	// ノルマ用のスプライト
+	LWP::Primitive::Sprite quotaArrowSprite_;
+	LWP::Primitive::Sprite quotaGoSprite_;
+	// 数字のスプライト
+	LWP::Primitive::Sprite numSprite100_[10];
+	LWP::Primitive::Sprite numSprite10_[10];
+	LWP::Primitive::Sprite numSprite1_[10];
+	// スプライトの縦揺れ用radian
+	float spriteRadian_ = 0.0f;
+
 
 	// ブロックの種類
 	enum class OreType {

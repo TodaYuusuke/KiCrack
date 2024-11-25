@@ -120,16 +120,6 @@ void Player::Init(LWP::Object::Camera* camera) {
 	spaceButtonSprite_[0].worldTF.translation = { 300.0f,900.0f,1.0f };
 	spaceButtonSprite_[0].worldTF.scale = { 2.0f,2.0f,1.0f };
 	spaceButtonSprite_[1].worldTF = spaceButtonSprite_[0].worldTF;
-
-	moveStrSprite_.name = "moveStrSprite_";
-	jumpStrSprite_.name = "jumpStrSprite_";
-	dropStrSprite_.name = "dropStrSprite_";
-	moveButtonASprite_[0].name = "moveButtonASprite_";
-	moveButtonASprite_[1].name = "moveButtonASprite_1";
-	moveButtonDSprite_[0].name = "moveButtonDSprite_";
-	moveButtonDSprite_[1].name = "moveButtonDSprite_1";
-	spaceButtonSprite_[0].name = "spaceButtonSprite_";
-	spaceButtonSprite_[1].name = "spaceButtonSprite_1";
 #pragma endregion
 }
 void Player::Update() {

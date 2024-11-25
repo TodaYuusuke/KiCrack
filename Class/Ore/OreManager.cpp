@@ -10,11 +10,47 @@ OreManager::OreManager() {
 	particle_.model.worldTF.scale = { 0.05f,0.05f,0.05f };
 	particle_.model.materials["Material"].color = Color(82, 158, 255, 255);
 
+	// スプライト
 	for (int i = 0; i < 3; i++) {
 		sprite3D_[i].material.texture = LoadTexture("UI/LevelUpBorder/LevelUpBorder.png");
 		sprite3D_[i].worldTF.translation.z = 1.0f;
 		sprite3D_[i].worldTF.scale.x = 15.0f;
 		sprite3D_[i].name = "LevelUpBorder" + std::to_string(i);
+	}
+	quotaArrowSprite_.material.texture = LoadTexture("UI/Quota/Arrow.png");
+	quotaArrowSprite_.material.color.A = 127;
+	quotaArrowSprite_.anchorPoint = { 0.5f,0.5f };
+	quotaArrowSprite_.worldTF.translation = { 960.0f, 970.0f, 1.0f };
+	quotaGoSprite_.material.texture = LoadTexture("UI/Quota/GO.png");
+	quotaGoSprite_.material.color.A = 127;
+	quotaGoSprite_.anchorPoint = { 0.5f,0.5f };
+	quotaGoSprite_.worldTF.Parent(&quotaArrowSprite_.worldTF);
+	quotaGoSprite_.worldTF.translation = { 0.0f, -60.0f, 1.0f };
+	quotaGoSprite_.worldTF.scale = { 1.3f,1.3f,1.0f };
+	quotaGoSprite_.isActive = false;
+	for (int i = 0; i < 10; i++) {
+		numSprite100_[i].material.texture = LoadTexture("UI/Numbers/" + std::to_string(i) + ".png");
+		numSprite10_[i].material.texture = LoadTexture("UI/Numbers/" + std::to_string(i) + ".png");
+		numSprite1_[i].material.texture = LoadTexture("UI/Numbers/" + std::to_string(i) + ".png");
+		numSprite100_[i].material.color.A = 127;
+		numSprite10_[i].material.color.A = 127;
+		numSprite1_[i].material.color.A = 127;
+
+		numSprite100_[i].anchorPoint = { 0.5f,0.5f };
+		numSprite10_[i].anchorPoint = { 0.5f,0.5f };
+		numSprite1_[i].anchorPoint = { 0.5f,0.5f };
+
+		numSprite100_[i].worldTF.Parent(&quotaArrowSprite_.worldTF);
+		numSprite10_[i].worldTF.Parent(&quotaArrowSprite_.worldTF);
+		numSprite1_[i].worldTF.Parent(&quotaArrowSprite_.worldTF);
+		numSprite100_[i].worldTF.translation = { -40.0f, -60.0f, 1.0f };
+		numSprite10_[i].worldTF.translation = { 0.0f, -60.0f, 1.0f };
+		numSprite1_[i].worldTF.translation = { 40.0f, -60.0f, 1.0f };
+
+		float s = 0.7f;
+		numSprite100_[i].worldTF.scale = { s,s,s };
+		numSprite10_[i].worldTF.scale = { s,s,s };
+		numSprite1_[i].worldTF.scale = { s,s,s };
 	}
 }
 
@@ -103,6 +139,33 @@ void OreManager::Init(int level) {
 }
 void OreManager::Update() {
 	for (IOre* o : ores_) { o->Update(); }
+
+	// アローを縦揺れさせる
+	spriteRadian_ += 0.07f;
+	if (spriteRadian_ > 6.28f) {
+		spriteRadian_ -= 6.28f;
+	}
+	quotaArrowSprite_.worldTF.translation.y = 970.0f + sinf(spriteRadian_) * 3.0f;
+
+	// スコアを表示
+	if (quota_ > 0) {
+		for (int i = 0; i < 10; i++) {
+			numSprite100_[i].isActive = (i == quota_ / 100);
+			numSprite10_[i].isActive = (i == quota_ % 100 / 10);
+			numSprite1_[i].isActive = (i == quota_ % 100 % 10);
+		}
+		quotaGoSprite_.isActive = false;
+	}
+	// クリア済みなのでGoを表示する
+	else {
+		for (int i = 0; i < 10; i++) {
+			numSprite100_[i].isActive = false;
+			numSprite10_[i].isActive = false;
+			numSprite1_[i].isActive = false;
+		}
+
+		quotaGoSprite_.isActive = true;
+	}
 };
 
 int OreManager::GetHeightLevel(float y, float highestY) {
