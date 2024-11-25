@@ -55,6 +55,8 @@ private: // ** メンバ変数 ** //
 	// 鉱石がダメージを受けたときのパーティクル
 	OreParticle particle_;
 
+	// レベルアップボーダー表示
+	LWP::Primitive::Surface sprite3D_[3];
 
 	// ブロックの種類
 	enum class OreType {

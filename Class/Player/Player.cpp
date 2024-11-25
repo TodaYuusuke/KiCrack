@@ -6,6 +6,7 @@ using namespace LWP::Input;
 using namespace LWP::Object;
 using namespace LWP::Math;
 using namespace LWP::Info;
+using namespace LWP::Resource;
 using namespace LWP::Utility;
 
 void Player::Init(LWP::Object::Camera* camera) {
@@ -80,6 +81,18 @@ void Player::Init(LWP::Object::Camera* camera) {
 	dropParticle_.model.materials["Material"].color = Color(255, 100, 0, 255);
 	dropParticle_.fallSpeed = -parameter_.kDropSpeed + 0.05f;
 	dropParticle_.hitStop = &hitStop_;
+
+	// ドロップレベル表示UI
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			// テクスチャ読み込み
+			if (i == 0) { sprite_[i][j].material.texture = LoadTexture("UI/DropLvBar/DropLv0/DropLvBar.png"); }
+			else { sprite_[i][j].material.texture = LoadTexture("UI/DropLvBar/DropLv" + std::to_string(i) + "/DropLvBar0" + std::to_string(j) + ".png"); }
+			// 位置調整
+			sprite_[i][j].worldTF.translation = { 1465.0f, 600.0f, 0.0f };
+			sprite_[i][j].isActive = false;
+		}
+	}
 }
 void Player::Update() {
 #if DEMO
@@ -124,7 +137,7 @@ void Player::Update() {
 #endif
 
 	// ヒットストップ中は早期リターン
-	hitStop_ -= GetDefaultDeltaTimeF();
+	hitStop_ -= GetDeltaTimeF();
 	if (hitStop_ > 0.0f) {return; }
 	else { hitStop_ = 0.0f; }
 
@@ -132,6 +145,7 @@ void Player::Update() {
 	velocityY_ = std::max<float>(velocityY_, parameter_.kFallMaxSpeed);	// ある程度以上の落下速度にならないように設定
 	model_.worldTF.translation.y += velocityY_;
 	CameraMove();
+	DropLevelUpdate();
 }
 
 void Player::StageStart() {
@@ -202,6 +216,27 @@ void Player::CameraMove() {
 		// 地面の下を貫通しないようにカメラを調整
 		cameraPtr_->worldTF.translation.y = std::max<float>(cameraPtr_->worldTF.translation.y, parameter_.kCameraMinBorderY);
 	}
+}
+void Player::DropLevelUpdate() {
+	// 落下中はレベルを更新しない
+	if (statePattern_.GetCurrentBehavior() != State::Dropping) {
+		// 落下攻撃のレベルを設定
+		int pre = dropLevel_;
+		dropLevel_ = OreManager::GetHeightLevel(model_.worldTF.translation.y, dropLevelMaxHeight_) - 1;
+		// 値が変わったときの処理
+		if (pre != dropLevel_) {
+			// フラグ初期化
+			for (int i = 0; i < 4; i++) { sprite_[pre][i].isActive = false; }
+		}
+	}
+
+	// フラグを初期化
+	for (int i = 0; i < 4; i++) { sprite_[dropLevel_][i].isActive = false; }
+	spriteT_ = std::fmod(spriteT_ + GetDeltaTimeF(), 2.0f);	// アニメーションタイムを更新
+	// 適切なUIのフラグをtrueに
+	int index = static_cast<int>((spriteT_ - 1.8f) / 0.05f);
+	if (index < 0) { index = 0; }
+	sprite_[dropLevel_][index].isActive = true;
 }
 bool Player::GroundBorderCheck() {
 	// もしノルマクリアによって床の判定が消えた場合 -> チェックしない
@@ -297,13 +332,11 @@ void Player::UpdateDropStart(std::optional<State>& req, const State& pre) {
 		dropAABB_->min = parameter_.kDropSizeMin;
 		dropAABB_->max = parameter_.kDropSizeMax;
 		dropParticle_.lifeTime = parameter_.kDropParticleLifeTime;	// パーティクルの寿命を設定
-		// 落下攻撃のレベルを設定
-     	float level = static_cast<float>(OreManager::GetHeightLevel(model_.worldTF.translation.y, dropLevelMaxHeight_)) - 1;
 		// レベル0以上ならサイズに倍率をかける
-		if (level > 0) {
-			dropAABB_->min.x *= level * parameter_.kDropLevelMultiply;
-			dropAABB_->max.x *= level * parameter_.kDropLevelMultiply;
-			dropParticle_.lifeTime *= level * parameter_.kDropLevelMultiply;
+		if (dropLevel_ > 0) {
+			dropAABB_->min.x *= dropLevel_ * parameter_.kDropLevelMultiply;
+			dropAABB_->max.x *= dropLevel_ * parameter_.kDropLevelMultiply;
+			dropParticle_.lifeTime *= dropLevel_ * parameter_.kDropLevelMultiply;
 		}
 	}
 	GroundBorderCheck();

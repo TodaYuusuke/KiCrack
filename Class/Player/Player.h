@@ -106,6 +106,9 @@ private: // ** メンバ変数 ** //
 
 	// パリィの残り時間
 	float parryTime_ = 0.0f;
+
+	// 現在の落下攻撃のレベル
+	int dropLevel_ = 0;
 	// 落下攻撃までの入力時間
 	float dropInputTime_ = 0.0f;
 	// 落下攻撃のレベル判定用の高さ
@@ -115,6 +118,11 @@ private: // ** メンバ変数 ** //
 
 	// 落下攻撃のパーティクル
 	DropParticle dropParticle_;
+
+	// 落下攻撃レベルのUI
+	LWP::Primitive::Sprite sprite_[4][4];
+	// アニメーション時間
+	float spriteT_ = 0.0f;
 
 private: // ** プライベートなメンバ関数 ** //
 
@@ -139,6 +147,10 @@ private: // ** プライベートなメンバ関数 ** //
 	/// カメラを追従させる
 	/// </summary>
 	void CameraMove();
+	/// <summary>
+	/// ドロップレベルの更新
+	/// </summary>
+	void DropLevelUpdate();
 
 	/// <summary>
 	/// 地面を貫通しないかチェックする関数

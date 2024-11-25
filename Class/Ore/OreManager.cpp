@@ -1,6 +1,7 @@
 #include "OreManager.h"
 
 using namespace LWP::Math;
+using namespace LWP::Resource;
 using namespace LWP::Utility;
 
 OreManager::OreManager() {
@@ -8,6 +9,13 @@ OreManager::OreManager() {
 	particle_.model.LoadCube();
 	particle_.model.worldTF.scale = { 0.05f,0.05f,0.05f };
 	particle_.model.materials["Material"].color = Color(82, 158, 255, 255);
+
+	for (int i = 0; i < 3; i++) {
+		sprite3D_[i].material.texture = LoadTexture("UI/LevelUpBorder/LevelUpBorder.png");
+		sprite3D_[i].worldTF.translation.z = 1.0f;
+		sprite3D_[i].worldTF.scale.x = 15.0f;
+		sprite3D_[i].name = "LevelUpBorder" + std::to_string(i);
+	}
 }
 
 void OreManager::Init(int level) {
@@ -85,6 +93,12 @@ void OreManager::Init(int level) {
 	for (IOre* o : ores_) {
 		float y = o->GetWorldPosition().y;
 		o->SetScore(OreManager::GetHeightLevel(y, highestY_));
+	}
+
+	// レベルアップボーダーを配置する
+	float unit = highestY_ / 3.0f;
+	for (int i = 0; i < 3; i++) {
+		sprite3D_[i].worldTF.translation.y = unit * (i + 1);
 	}
 }
 void OreManager::Update() {
