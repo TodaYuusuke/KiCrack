@@ -158,10 +158,13 @@
     <ClCompile Include="Class\Ore\OreParticle.cpp" />
     <ClCompile Include="Class\Player\DropParticle.cpp" />
     <ClCompile Include="Class\Player\Player.cpp" />
+    <ClCompile Include="Class\Scene\FadeManager.cpp" />
     <ClCompile Include="Class\Scene\GameScene.cpp" />
+    <ClCompile Include="Class\Scene\NullScene.cpp" />
     <ClCompile Include="Class\Scene\Title.cpp" />
     <ClCompile Include="Class\Stage\Field.cpp" />
     <ClCompile Include="Class\Stage\StageManager.cpp" />
+    <ClCompile Include="Class\Stage\TutorialManager.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -178,10 +181,13 @@
     <ClInclude Include="Class\Ore\OreParticle.h" />
     <ClInclude Include="Class\Player\DropParticle.h" />
     <ClInclude Include="Class\Player\Player.h" />
+    <ClInclude Include="Class\Scene\FadeManager.h" />
     <ClInclude Include="Class\Scene\GameScene.h" />
+    <ClInclude Include="Class\Scene\NullScene.h" />
     <ClInclude Include="Class\Scene\Title.h" />
     <ClInclude Include="Class\Stage\Field.h" />
     <ClInclude Include="Class\Stage\StageManager.h" />
+    <ClInclude Include="Class\Stage\TutorialManager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

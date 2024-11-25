@@ -212,12 +212,14 @@ bool Player::Move() {
 	// キー入力
 	if (pressD) { x += 1.0f; }
 	if (pressA) { x -= 1.0f; }
+	// モデルの向きを合わせる
+	model_.worldTF.rotation = Quaternion::CreateFromAxisAngle(Vector3::UnitY(), 1.57f * x);
 
 	// モデルを移動
 	posX += x * parameter_.kWalkSpeed;
 	// エリア外に行かないように調整
 	posX = std::clamp(posX, -parameter_.kFieldBorder, parameter_.kFieldBorder);
-	
+
 	return true;
 }
 bool Player::Parry() {

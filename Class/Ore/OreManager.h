@@ -18,6 +18,10 @@ public: // ** メンバ関数 ** //
 	/// コンストラクタ
 	/// </summary>
 	OreManager();
+	/// <summary>
+	/// デストラクタ
+	/// </summary>
+	~OreManager();
 
 	/// <summary>
 	/// 初期化
@@ -33,6 +37,10 @@ public: // ** メンバ関数 ** //
 	/// </summary>
 	/// <param name="mainCamera"></param>
 	void SetCamera(LWP::Object::Camera* camera) { cameraPtr_ = camera; }
+	/// <summary>
+	/// ノルマをセット（チュートリアル用）
+	/// </summary>
+	void SetQuota(int i) { quota_ = i; }
 
 	/// <summary>
 	/// 落下攻撃用の鉱石最大地点を返す関数

@@ -5,6 +5,19 @@
 /// プレイヤークラス
 /// </summary>
 class Player final {
+public: // ** パブリックなメンバ変数 ** //
+	// プレイヤーのステート
+	enum class State {
+		Idle,	// 無操作
+		Walk,	// 歩き
+		Jump,	// ジャンプ
+		Parry,	// パリィ
+		Falling,	// 自由落下
+		DropStart,	// 落下攻撃開始
+		Dropping,	// 落下攻撃中
+		Count	// サイズカウント
+	};
+
 public: // ** メンバ関数 ** //
 
 	/// <summary>
@@ -31,7 +44,16 @@ public: // ** メンバ関数 ** //
 	/// </summary>
 	/// <param name="b"></param>
 	void SetStageClearFlag(bool b) { stageClearFlag_ = b; }
+	/// <summary>
+	///　次のステートを設定する
+	/// </summary>
+	void SetState(State s) { statePattern_.request = s; };
 
+
+	/// <summary>
+	/// 現在のステートを返す
+	/// </summary>
+	State GetCurrentState() { return statePattern_.GetCurrentBehavior(); };
 	/// <summary>
 	/// 次のステージへ行くかのフラグを返す（ある程度0より下の座標についた場合に次のステージへ）
 	/// </summary>
@@ -81,17 +103,7 @@ private: // ** メンバ変数 ** //
 	// ドロップコライダー
 	LWP::Object::Collision dropCollision_;
 
-	// プレイヤーのステート
-	enum class State {
-		Idle,	// 無操作
-		Walk,	// 歩き
-		Jump,	// ジャンプ
-		Parry,	// パリィ
-		Falling,	// 自由落下
-		DropStart,	// 落下攻撃開始
-		Dropping,	// 落下攻撃中
-		Count	// サイズカウント
-	};
+	
 	LWP::Utility::StatePattern<State, static_cast<int>(State::Count)> statePattern_;
 	// 状態をintに変換する関数
 	int GetInt(const State& s) { return static_cast<int>(s); }

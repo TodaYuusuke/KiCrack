@@ -1,4 +1,6 @@
 #include "GameScene.h"
+#include "Title.h"
+#include "NullScene.h"
 
 using namespace LWP;
 using namespace LWP::Input;
@@ -13,6 +15,8 @@ void GameScene::Initialize() {
 	player_.Init(&mainCamera);
 	stageManager_.Init(&mainCamera);
 	player_.SetDropLevelBorder(stageManager_.GetDropLevelBorder());	// 落下攻撃レベルボーダー設定
+
+	fadeManager_.Init();
 }
 
 // 更新
@@ -26,9 +30,17 @@ void GameScene::Update() {
 	// プレイヤーがある程度下層まで到達したら次のステージへ
 	if (player_.GetNextStageFlag()) {
 		// 次のステージへいけなかった場合はゲームクリアなので終了
-		if (!stageManager_.NextStage()) {}
+		if (!stageManager_.NextStage()) {
+			fadeManager_.Out();	// フェードアウト開始
+		}
 		// 初期設定
 		player_.SetDropLevelBorder(stageManager_.GetDropLevelBorder());	// 落下攻撃レベルボーダー設定
 		player_.StageStart();	// ステージ開始時に必要な処理をまとめた関数を呼び出す
+	}
+
+	// フェードアウトが終わったら次のシーンへ
+	fadeManager_.Update();
+	if (fadeManager_.GetOut()) {
+		nextSceneFunction = []() { return new NullScene([]() { return new Title (); }); };
 	}
 }

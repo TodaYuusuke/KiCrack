@@ -39,5 +39,5 @@ private: // ** メンバ変数 ** //
 	// 鉱石管理クラス
 	OreManager oreManager_;
 
-	int currentStageLevel = 1;
+	int currentStageLevel = 10;
 };

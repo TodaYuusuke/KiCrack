@@ -55,4 +55,5 @@ private: // ** メンバ変数 ** //
 	LWP::Primitive::Surface numSprite100_[10];
 	LWP::Primitive::Surface numSprite10_[10];
 	LWP::Primitive::Surface numSprite1_[10];
+	LWP::Primitive::Surface infinitySprite_;
 };

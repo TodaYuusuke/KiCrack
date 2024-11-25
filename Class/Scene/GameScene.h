@@ -4,6 +4,8 @@
 #include "Player/Player.h"
 #include "Stage/StageManager.h"
 
+#include "FadeManager.h"
+
 class GameScene final
 	: public IScene {
 public:
@@ -25,4 +27,6 @@ private: //*** これより先に必要な処理や変数を記述 ***//
 
 	// ステージ管理クラス
 	StageManager stageManager_;
+	// フェードインアウト管理クラス
+	FadeManager fadeManager_;
 };

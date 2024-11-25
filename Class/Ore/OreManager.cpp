@@ -54,6 +54,12 @@ OreManager::OreManager() {
 	}
 }
 
+OreManager::~OreManager() {
+	// 鉱石クリア
+	for (IOre* o : ores_) { delete o; }
+	ores_.clear();
+}
+
 void OreManager::Init(int level) {
 	// 鉱石クリア
 	for (IOre* o : ores_) { delete o; }
@@ -88,28 +94,28 @@ void OreManager::Init(int level) {
 		// 鉱石の種類決定
 		IOre* o = nullptr;
 		switch (static_cast<OreType>(std::stoi(strvec[2]))) {
-			case OreType::Normal:
-				o = new Normal();
-				break;
-			case OreType::Weak:
-				o = new Weak();
-				break;
-			case OreType::Explosive:
-				// リメイク前の未実装部分（CSVの値を書き換えるのが面倒なのでそのまま）
-				o = new Normal();
-				break;
-			case OreType::HorizontalMove_LeftStart:
-				o = new MoveHN_L(t);
-				break;
-			case OreType::HorizontalMove_RightStart:
-				o = new MoveHN_R(t);
-				break;
-			case OreType::VerticalMove_DownStart:
-				o = new MoveVT_D(t);
-				break;
-			case OreType::VerticalMove_UpStart:
-				o = new MoveVT_U(t);
-				break;
+		case OreType::Normal:
+			o = new Normal();
+			break;
+		case OreType::Weak:
+			o = new Weak();
+			break;
+		case OreType::Explosive:
+			// リメイク前の未実装部分（CSVの値を書き換えるのが面倒なのでそのまま）
+			o = new Normal();
+			break;
+		case OreType::HorizontalMove_LeftStart:
+			o = new MoveHN_L(t);
+			break;
+		case OreType::HorizontalMove_RightStart:
+			o = new MoveHN_R(t);
+			break;
+		case OreType::VerticalMove_DownStart:
+			o = new MoveVT_D(t);
+			break;
+		case OreType::VerticalMove_UpStart:
+			o = new MoveVT_U(t);
+			break;
 		}
 
 		std::function<void()> f = []() {};
@@ -123,6 +129,12 @@ void OreManager::Init(int level) {
 
 		// 一番高い位置を求める
 		highestY_ = std::max<float>(highestY_, pos.y);	// 最大値を返す
+	}
+	// チュートリアル用の特殊な処理
+	if (level == 0) {
+		highestY_ = 10000.0f;
+		quotaGoSprite_.material.texture = LoadTexture("UI/Numbers/Infinity.png");
+		quotaGoSprite_.worldTF.scale = { 1.0f,1.0f,1.0f };
 	}
 
 	// スコアを付与する

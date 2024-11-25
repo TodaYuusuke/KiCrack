@@ -2,6 +2,7 @@
 
 #include "Mask.h"
 
+using namespace LWP::Math;
 using namespace LWP::Object;
 using namespace LWP::Resource;
 
@@ -52,6 +53,9 @@ void Field::Init(LWP::Object::Camera* camera) {
 		numSprite100_[i].worldTF.translation.x = -0.8f;
 		numSprite1_[i].worldTF.translation.x = 0.8f;
 	}
+	infinitySprite_.material.texture = LoadTexture("UI/Numbers/Infinity.png");
+	infinitySprite_.worldTF.Parent(&numSprite10_[0].worldTF);
+	infinitySprite_.worldTF.scale = { 1.3f,1.3f, 1.3f };
 }
 
 void Field::Update(int quota) {
@@ -66,9 +70,14 @@ void Field::Update(int quota) {
 		numSprite10_[i].isActive = false;
 		numSprite1_[i].isActive = false;
 	}
-	
+	infinitySprite_.isActive = false;
+
 	// スコアを表示
-	if (quota > 0) {
+	if (quota < -1000) {
+		// ノルマがチュートリアル用のものである場合の特殊な処理
+		infinitySprite_.isActive = true;
+	}
+	else if (quota > 0) {
 		numSprite100_[quota / 100].isActive = true;
 		numSprite10_[quota % 100 / 10].isActive = true;
 		numSprite1_[quota % 100 % 10].isActive = true;

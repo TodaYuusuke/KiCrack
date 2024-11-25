@@ -1,5 +1,9 @@
 #pragma once
 #include "scene/IScene.h"
+#include "FadeManager.h"
+
+#include "Player/Player.h"
+#include "Stage/TutorialManager.h"
 
 class Title final
 	: public IScene {
@@ -15,7 +19,13 @@ public:
 	void Update() override;
 
 
-private: //*** これより先に必要な処理や変数を記述 ***//
+private: // ** これより先に必要な処理や変数を記述 ** //
 
-	
+	// プレイヤー
+	Player player_;
+	// ステージ管理クラス
+	TutorialManager tutorialManager_;
+
+	// フェードインアウト管理クラス
+	FadeManager fadeManager_;
 };
