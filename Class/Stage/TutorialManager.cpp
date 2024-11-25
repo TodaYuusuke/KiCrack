@@ -77,10 +77,6 @@ void TutorialManager::Update() {
 
 	// クリアしたら床の当たり判定を消す
 	field_.ChangeFloorFlag(!GetIsClear());
-
-	ImGui::Begin("a");
-	statePattern_.DebugGUI();
-	ImGui::End();
 }
 
 bool TutorialManager::GetIsClear() {
