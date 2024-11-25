@@ -5,10 +5,11 @@ using namespace LWP::Object;
 void StageManager::Init(Camera* camera) {
 	field_.Init(camera);
 	oreManager_.Init(currentStageLevel);
+	oreManager_.SetCamera(camera);
 }
 void StageManager::Update() {
-	field_.Update();
 	oreManager_.Update();
+	field_.Update(oreManager_.GetCurrentQuota());
 
 	// クリアしたら床の当たり判定を消す
 	field_.ChangeFloorFlag(!GetIsClear());

@@ -3,6 +3,7 @@
 #include "Mask.h"
 
 using namespace LWP::Object;
+using namespace LWP::Resource;
 
 void Field::Init(LWP::Object::Camera* camera) {
 	cameraPtr_ = camera;
@@ -35,11 +36,41 @@ void Field::Init(LWP::Object::Camera* camera) {
 	floorCollision_.mask.SetHitFrag(KCMask::Particle());
 	Collider::AABB& aabb = floorCollision_.SetBroadShape(Collider::AABB());
 	aabb.Create(floor_);
+
+	// ノルマ表示用テクスチャ
+	numSprite10_[0].worldTF.translation = { 0.0f,-0.7f,-1.0f };
+	numSprite10_[0].worldTF.scale = { 0.8f,0.8f,1.0f };
+	numSprite10_[0].name = "Center";
+	for (int i = 0; i < 10; i++) {
+		numSprite100_[i].material.texture = LoadTexture("UI/Numbers/" + std::to_string(i) + ".png");
+		numSprite10_[i].material.texture = LoadTexture("UI/Numbers/" + std::to_string(i) + ".png");
+		numSprite1_[i].material.texture = LoadTexture("UI/Numbers/" + std::to_string(i) + ".png");
+
+		numSprite100_[i].worldTF.Parent(&numSprite10_[0].worldTF);
+		if (i != 0) { numSprite10_[i].worldTF.Parent(&numSprite10_[0].worldTF); }
+		numSprite1_[i].worldTF.Parent(&numSprite10_[0].worldTF);
+		numSprite100_[i].worldTF.translation.x = -0.8f;
+		numSprite1_[i].worldTF.translation.x = 0.8f;
+	}
 }
 
-void Field::Update() {
+void Field::Update(int quota) {
 	// カメラと高さを合わせる
 	for (int i = 0; i < 3; i++) {
 		wall_[i].worldTF.translation.y = cameraPtr_->worldTF.GetWorldPosition().y - 3.5f;
+	}
+
+	// フラグ初期化
+	for (int i = 0; i < 10; i++) {
+		numSprite100_[i].isActive = false;
+		numSprite10_[i].isActive = false;
+		numSprite1_[i].isActive = false;
+	}
+	
+	// スコアを表示
+	if (quota > 0) {
+		numSprite100_[quota / 100].isActive = true;
+		numSprite10_[quota % 100 / 10].isActive = true;
+		numSprite1_[quota % 100 % 10].isActive = true;
 	}
 }

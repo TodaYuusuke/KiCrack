@@ -14,7 +14,7 @@ public: // ** メンバ関数 ** //
 	/// <summary>
 	/// 更新
 	/// </summary>
-	void Update();
+	void Update(int quota);
 
 	/// <summary>
 	/// 床のフラグ切り替え
@@ -50,4 +50,9 @@ private: // ** メンバ変数 ** //
 	// 床のモデル
 	LWP::Resource::RigidModel floor_;
 	LWP::Object::Collision floorCollision_;	// 当たり判定
+
+	// 数字のテクスチャ
+	LWP::Primitive::Surface numSprite100_[10];
+	LWP::Primitive::Surface numSprite10_[10];
+	LWP::Primitive::Surface numSprite1_[10];
 };

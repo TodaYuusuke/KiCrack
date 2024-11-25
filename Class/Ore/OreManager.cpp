@@ -140,30 +140,33 @@ void OreManager::Init(int level) {
 void OreManager::Update() {
 	for (IOre* o : ores_) { o->Update(); }
 
+	// フラグ初期化
+	for (int i = 0; i < 10; i++) {
+		numSprite100_[i].isActive = false;
+		numSprite10_[i].isActive = false;
+		numSprite1_[i].isActive = false;
+	}
+	quotaArrowSprite_.isActive = false;
+	quotaGoSprite_.isActive = false;
+
+	// カメラがある程度下に行ったら非表示にする
+	if (cameraPtr_->worldTF.GetWorldPosition().y <= 3.5f) { return; }
+
 	// アローを縦揺れさせる
 	spriteRadian_ += 0.07f;
 	if (spriteRadian_ > 6.28f) {
 		spriteRadian_ -= 6.28f;
 	}
 	quotaArrowSprite_.worldTF.translation.y = 970.0f + sinf(spriteRadian_) * 3.0f;
-
+	quotaArrowSprite_.isActive = true;
 	// スコアを表示
 	if (quota_ > 0) {
-		for (int i = 0; i < 10; i++) {
-			numSprite100_[i].isActive = (i == quota_ / 100);
-			numSprite10_[i].isActive = (i == quota_ % 100 / 10);
-			numSprite1_[i].isActive = (i == quota_ % 100 % 10);
-		}
-		quotaGoSprite_.isActive = false;
+		numSprite100_[quota_ / 100].isActive = true;
+		numSprite10_[quota_ % 100 / 10].isActive = true;
+		numSprite1_[quota_ % 100 % 10].isActive = true;
 	}
 	// クリア済みなのでGoを表示する
 	else {
-		for (int i = 0; i < 10; i++) {
-			numSprite100_[i].isActive = false;
-			numSprite10_[i].isActive = false;
-			numSprite1_[i].isActive = false;
-		}
-
 		quotaGoSprite_.isActive = true;
 	}
 };

@@ -29,6 +29,12 @@ public: // ** メンバ関数 ** //
 	void Update();
 
 	/// <summary>
+	/// カメラをセット（ノルマ表示用）
+	/// </summary>
+	/// <param name="mainCamera"></param>
+	void SetCamera(LWP::Object::Camera* camera) { cameraPtr_ = camera; }
+
+	/// <summary>
 	/// 落下攻撃用の鉱石最大地点を返す関数
 	/// </summary>
 	float GetDropLevelBorder() { return highestY_; }
@@ -44,6 +50,8 @@ public: // ** メンバ関数 ** //
 
 
 private: // ** メンバ変数 ** //
+	// カメラのポインタ
+	LWP::Object::Camera* cameraPtr_ = nullptr;
 
 	// 鉱石たち
 	std::vector<IOre*> ores_;
