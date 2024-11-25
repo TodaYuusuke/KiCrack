@@ -124,6 +124,14 @@ private: // ** メンバ変数 ** //
 	// アニメーション時間
 	float spriteT_ = 0.0f;
 
+	// 操作UI
+	LWP::Primitive::Sprite moveStrSprite_;
+	LWP::Primitive::Sprite jumpStrSprite_;
+	LWP::Primitive::Sprite dropStrSprite_;
+	LWP::Primitive::Sprite moveButtonASprite_[2];
+	LWP::Primitive::Sprite moveButtonDSprite_[2];
+	LWP::Primitive::Sprite spaceButtonSprite_[2];
+
 private: // ** プライベートなメンバ関数 ** //
 
 	/// <summary>

@@ -82,6 +82,7 @@ void Player::Init(LWP::Object::Camera* camera) {
 	dropParticle_.fallSpeed = -parameter_.kDropSpeed + 0.05f;
 	dropParticle_.hitStop = &hitStop_;
 
+#pragma region スプライト
 	// ドロップレベル表示UI
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 4; j++) {
@@ -93,6 +94,43 @@ void Player::Init(LWP::Object::Camera* camera) {
 			sprite_[i][j].isActive = false;
 		}
 	}
+
+	// 操作UIの初期化
+	moveStrSprite_.material.texture = LoadTexture("Tutorial/Move_string.png");
+	jumpStrSprite_.material.texture = LoadTexture("Tutorial/Jump_string.png");
+	dropStrSprite_.material.texture = LoadTexture("Tutorial/Drop_string.png");
+	moveButtonASprite_[0].material.texture = LoadTexture("Tutorial/Button/ButtonA.png");
+	moveButtonASprite_[1].material.texture = LoadTexture("Tutorial/Button/ButtonA_Pressed.png");
+	moveButtonDSprite_[0].material.texture = LoadTexture("Tutorial/Button/ButtonD.png");
+	moveButtonDSprite_[1].material.texture = LoadTexture("Tutorial/Button/ButtonD_Pressed.png");
+	spaceButtonSprite_[0].material.texture = LoadTexture("Tutorial/Button/ButtonSpace.png");
+	spaceButtonSprite_[1].material.texture = LoadTexture("Tutorial/Button/ButtonSpace_Pressed.png");
+	moveStrSprite_.worldTF.translation = { 0.0f,780.0f,1.0f };
+	moveStrSprite_.worldTF.scale = { 0.5f,0.5f,1.0f };
+	jumpStrSprite_.worldTF.translation = { 0.0f,865.0f,1.0f };
+	jumpStrSprite_.worldTF.scale = { 0.5f,0.5f,1.0f };
+	dropStrSprite_.worldTF.translation = { 0.0f,913.0f,1.0f };
+	dropStrSprite_.worldTF.scale = { 0.5f,0.5f,1.0f };
+	moveButtonASprite_[0].worldTF.translation = { 300.0f,800.0f,1.0f };
+	moveButtonASprite_[0].worldTF.scale = { 2.0f,2.0f,1.0f };
+	moveButtonASprite_[1].worldTF = moveButtonASprite_[0].worldTF;
+	moveButtonDSprite_[0].worldTF.translation = { 370.0f,800.0f,1.0f };
+	moveButtonDSprite_[0].worldTF.scale = { 2.0f,2.0f,1.0f };
+	moveButtonDSprite_[1].worldTF = moveButtonDSprite_[0].worldTF;
+	spaceButtonSprite_[0].worldTF.translation = { 300.0f,900.0f,1.0f };
+	spaceButtonSprite_[0].worldTF.scale = { 2.0f,2.0f,1.0f };
+	spaceButtonSprite_[1].worldTF = spaceButtonSprite_[0].worldTF;
+
+	moveStrSprite_.name = "moveStrSprite_";
+	jumpStrSprite_.name = "jumpStrSprite_";
+	dropStrSprite_.name = "dropStrSprite_";
+	moveButtonASprite_[0].name = "moveButtonASprite_";
+	moveButtonASprite_[1].name = "moveButtonASprite_1";
+	moveButtonDSprite_[0].name = "moveButtonDSprite_";
+	moveButtonDSprite_[1].name = "moveButtonDSprite_1";
+	spaceButtonSprite_[0].name = "spaceButtonSprite_";
+	spaceButtonSprite_[1].name = "spaceButtonSprite_1";
+#pragma endregion
 }
 void Player::Update() {
 #if DEMO
@@ -146,6 +184,17 @@ void Player::Update() {
 	model_.worldTF.translation.y += velocityY_;
 	CameraMove();
 	DropLevelUpdate();
+
+	// 操作UIのフラグ操作
+	bool b = Keyboard::GetPress(DIK_A);
+	moveButtonASprite_[0].isActive = !b;
+	moveButtonASprite_[1].isActive = b;
+	b = Keyboard::GetPress(DIK_D);
+	moveButtonDSprite_[0].isActive = !b;
+	moveButtonDSprite_[1].isActive = b;
+	b = Keyboard::GetPress(DIK_SPACE);
+	spaceButtonSprite_[0].isActive = !b;
+	spaceButtonSprite_[1].isActive = b;
 }
 
 void Player::StageStart() {
