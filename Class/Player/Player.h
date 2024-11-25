@@ -1,5 +1,5 @@
 #pragma once
-#include <Adapter.h>
+#include "DropParticle.h"
 
 /// <summary>
 /// プレイヤークラス
@@ -62,11 +62,12 @@ private: // ** メンバ変数 ** //
 		float kDropLevelMultiply = 2.3f;	// ドロップ攻撃のレベルごとの倍率
 		float kDropEndJumpPower = kJumpPower * 0.4f;	// ドロップ終了時のジャンプ力
 		float kDropJudgeTime = 0.4f;	// 長押し判定に必要な秒数
+		float kDropParticleLifeTime = 0.06f;	// 落下攻撃のパーティクルの生存時間
 
 		float kCameraOffsetZ = -25.0f;	// カメラの距離
 		float kCameraMinBorderY = 3.5f;	// カメラの最低Y座標
 		float kCameraDistance = 0.1f;	// カメラとプレイヤーの離れてはいけない距離
-		float kHitStopTime = 0.03f;	// ヒットストップ時間
+		float kHitStopTime = 0.08f;	// ヒットストップ時間
 		float kFieldBorder = 5.0f;	// ステージのボーダー
 	}parameter_;
 
@@ -111,6 +112,9 @@ private: // ** メンバ変数 ** //
 	float dropLevelMaxHeight_ = 0.0f;
 	// 落下攻撃の当たり判定のポインタ
 	LWP::Object::Collider::AABB* dropAABB_;
+
+	// 落下攻撃のパーティクル
+	DropParticle dropParticle_;
 
 private: // ** プライベートなメンバ関数 ** //
 

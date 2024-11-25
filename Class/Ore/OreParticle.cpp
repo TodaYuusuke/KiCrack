@@ -10,6 +10,13 @@ using namespace LWP::Utility;
 void OreParticle::Generate(Data& newData) {
 	newData.m.materials = model.materials;	// マテリアルがコピーされていない不具合を修正
 
+	// 回転をランダムに
+	float radian = static_cast<float>(GenerateRandamNum<int>(0, 614)) / 100.0f;
+	newData.m.worldTF.rotation *=
+		Quaternion::CreateFromAxisAngle(Vector3::UnitX(), radian) *
+		Quaternion::CreateFromAxisAngle(Vector3::UnitY(), radian) *
+		Quaternion::CreateFromAxisAngle(Vector3::UnitZ(), radian);
+
 	// 速度ベクトルを生成
 	newData.velocity.x = static_cast<float>(GenerateRandamNum<int>(-100, 100)) / 100.0f;
 	newData.velocity.y = static_cast<float>(GenerateRandamNum<int>(-100, 100)) / 100.0f;
@@ -43,13 +50,17 @@ void OreParticle::Generate(Data& newData) {
 bool OreParticle::UpdateParticle(Data& data) {
 	data.velocity.y += -9.8f / 1200.0f;	// 重力を加算
 	data.m.worldTF.translation += data.velocity;    // 速度ベクトルを加算
+	data.m.worldTF.rotation *=
+		Quaternion::CreateFromAxisAngle(Vector3::UnitX(), data.velocity.x) *
+		Quaternion::CreateFromAxisAngle(Vector3::UnitY(), data.velocity.y) *
+		Quaternion::CreateFromAxisAngle(Vector3::UnitZ(), data.velocity.z);
 
 	// 経過フレーム加算
 	data.elapsedTime += GetDeltaTimeF();
 	if (data.elapsedTime > 4.0f) { data.elapsedTime = 4.0f; }
 
 	data.m.worldTF.scale = LWP::Utility::Interp::Lerp(model.worldTF.scale, { 0.0f,0.0f,0.0f }, LWP::Utility::Easing::InCubic(data.elapsedTime / 4.0f));
-	// 1秒かけて消滅アニメーションを完了したとき消滅する
+	// 4秒かけて消滅アニメーションを完了したとき消滅する
 	if (data.elapsedTime >= 4.0f) {
 		return true;
 	}

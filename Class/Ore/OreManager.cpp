@@ -6,7 +6,7 @@ using namespace LWP::Utility;
 OreManager::OreManager() {
 	// パーティクル初期設定
 	particle_.model.LoadCube();
-	particle_.model.worldTF.scale = { 0.03f,0.03f,0.03f };
+	particle_.model.worldTF.scale = { 0.05f,0.05f,0.05f };
 	particle_.model.materials["Material"].color = Color(82, 158, 255, 255);
 }
 

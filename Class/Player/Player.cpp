@@ -6,6 +6,7 @@ using namespace LWP::Input;
 using namespace LWP::Object;
 using namespace LWP::Math;
 using namespace LWP::Info;
+using namespace LWP::Utility;
 
 void Player::Init(LWP::Object::Camera* camera) {
 	// カメラ位置微調整
@@ -70,10 +71,15 @@ void Player::Init(LWP::Object::Camera* camera) {
 	statePattern_.name[GetInt(State::Falling)] = "Falling";
 	statePattern_.name[GetInt(State::DropStart)] = "DropStart";
 	statePattern_.name[GetInt(State::Dropping)] = "Dropping";
-	
 #endif
-
 #pragma endregion
+
+	// パーティクルの初期設定
+	dropParticle_.model.LoadCube();
+	dropParticle_.model.worldTF.scale = { 0.09f,0.09f,0.09f };
+	dropParticle_.model.materials["Material"].color = Color(255, 100, 0, 255);
+	dropParticle_.fallSpeed = -parameter_.kDropSpeed + 0.05f;
+	dropParticle_.hitStop = &hitStop_;
 }
 void Player::Update() {
 #if DEMO
@@ -102,6 +108,7 @@ void Player::Update() {
 		ImGui::DragFloat("DropSpeed", &parameter_.kDropSpeed, 0.01f);
 		ImGui::DragFloat("kDropEndJumpPower", &parameter_.kDropEndJumpPower, 0.01f);
 		ImGui::DragFloat("DropJudgeTime", &parameter_.kDropJudgeTime, 0.01f);
+		ImGui::DragFloat("kDropParticleLifeTime", &parameter_.kDropParticleLifeTime, 0.01f);
 		ImGui::Text("Other");
 		ImGui::DragFloat("CameraOffsetZ", &parameter_.kCameraOffsetZ, 0.01f);
 		ImGui::DragFloat("kCameraMinBorderY", &parameter_.kCameraMinBorderY, 0.01f);
@@ -117,8 +124,8 @@ void Player::Update() {
 #endif
 
 	// ヒットストップ中は早期リターン
-	hitStop_ -= GetDeltaTimeF();
-	if (hitStop_ > 0.0f) { return; }
+	hitStop_ -= GetDefaultDeltaTimeF();
+	if (hitStop_ > 0.0f) {return; }
 	else { hitStop_ = 0.0f; }
 
 	statePattern_.Update();
@@ -289,12 +296,14 @@ void Player::UpdateDropStart(std::optional<State>& req, const State& pre) {
 		req = State::Dropping;
 		dropAABB_->min = parameter_.kDropSizeMin;
 		dropAABB_->max = parameter_.kDropSizeMax;
+		dropParticle_.lifeTime = parameter_.kDropParticleLifeTime;	// パーティクルの寿命を設定
 		// 落下攻撃のレベルを設定
      	float level = static_cast<float>(OreManager::GetHeightLevel(model_.worldTF.translation.y, dropLevelMaxHeight_)) - 1;
 		// レベル0以上ならサイズに倍率をかける
 		if (level > 0) {
 			dropAABB_->min.x *= level * parameter_.kDropLevelMultiply;
 			dropAABB_->max.x *= level * parameter_.kDropLevelMultiply;
+			dropParticle_.lifeTime *= level * parameter_.kDropLevelMultiply;
 		}
 	}
 	GroundBorderCheck();
@@ -305,6 +314,11 @@ void Player::InitDropping(const State& pre) {
 	dropCollision_.isActive = true;	// コライダーを有効化
 }
 void Player::UpdateDropping(std::optional<State>& req, const State& pre) {
+	// パーティクルを生成
+	Vector3 p = model_.worldTF.GetWorldPosition();
+	p.y -= 0.1f;
+	dropParticle_.Add(4, p);
+
 	// もし地面についたら跳ねる
    	if (GroundBorderCheck()) {
 		model_.worldTF.translation.y = 0.0f;
