@@ -15,6 +15,10 @@ namespace KCMask {
     static int Drop() { return LWP::Config::Collider::MaskLayer::Layer5; }
     // パーティクル
     static int Particle() { return LWP::Config::Collider::MaskLayer::Particle; }
+    // 壁
+    static int Wall() { return LWP::Config::Collider::MaskLayer::Layer6; }
+    // 奥の壁
+    static int BackWall() { return LWP::Config::Collider::MaskLayer::Layer7; }
     // 地面
     static int Ground() { return LWP::Config::Collider::MaskLayer::Ground; }
     static int ALL() { return LWP::Config::Collider::MaskLayer::ALL; }

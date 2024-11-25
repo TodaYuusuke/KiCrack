@@ -20,7 +20,10 @@ public: // ** メンバ関数 ** //
 	/// 床のフラグ切り替え
 	/// </summary>
 	/// <param name="level"></param>
-	void ChangeFloorFlag(bool b) { floor.isActive = b; }
+	void ChangeFloorFlag(bool b) {
+		floor_.isActive = b;
+		floorCollision_.isActive = b;
+	}
 	/// <summary>
 	/// 床のテクスチャ変更
 	/// </summary>
@@ -42,9 +45,9 @@ private: // ** メンバ変数 ** //
 	LWP::Object::DirectionLight sun_;
 
 	// 壁のモデル
-	LWP::Resource::RigidModel wall[3];
+	LWP::Resource::RigidModel wall_[3];
 	LWP::Object::Collision wallCollision_[3];	// 当たり判定
 	// 床のモデル
-	LWP::Resource::RigidModel floor;
+	LWP::Resource::RigidModel floor_;
 	LWP::Object::Collision floorCollision_;	// 当たり判定
 };

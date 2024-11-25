@@ -41,6 +41,7 @@ void IOre::Init(LWP::Math::Vector2 pos, int* quota) {
 			// 体力を攻撃力分減らす
 			hp_ -= Player::kDropPower;
 		}
+		ore_(MaxHPModel_.worldTF.GetWorldPosition());	// パーティクル生成
 
 		// 体力が1になった場合 -> モデルを変更
 		if (hp_ == 1) {
@@ -60,7 +61,7 @@ void IOre::Init(LWP::Math::Vector2 pos, int* quota) {
 	aabb.min = { -0.25f, -0.25f, -0.56f };
 	aabb.max = { 0.25f, 0.25f, 0.0f };
 	
-	hp_ = parameter_.kMaxHP;
+	hp_ = parameter_.kMaxHP;	// 体力を初期化
 };
 
 void IOre::Update() {

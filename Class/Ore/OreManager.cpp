@@ -3,6 +3,13 @@
 using namespace LWP::Math;
 using namespace LWP::Utility;
 
+OreManager::OreManager() {
+	// パーティクル初期設定
+	particle_.model.LoadCube();
+	particle_.model.worldTF.scale = { 0.03f,0.03f,0.03f };
+	particle_.model.materials["Material"].color = Color(82, 158, 255, 255);
+}
+
 void OreManager::Init(int level) {
 	// 鉱石クリア
 	for (IOre* o : ores_) { delete o; }
@@ -61,7 +68,13 @@ void OreManager::Init(int level) {
 				break;
 		}
 
+		std::function<void()> f = []() {};
+
 		o->Init(pos, &quota_);
+		o->SetParticleFunction(
+			[this](Vector3 pos) { particle_.Add(16, pos); },
+			[this](Vector3 pos) { particle_.Add(16, pos); }
+		);
 		ores_.push_back(o);
 
 		// 一番高い位置を求める

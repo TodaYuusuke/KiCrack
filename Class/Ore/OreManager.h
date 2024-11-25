@@ -6,11 +6,18 @@
 #include "Child/MoveVT_D.h"
 #include "Child/MoveVT_U.h"
 
+#include "OreParticle.h"
+
 /// <summary>
 /// 鉱石管理クラス
 /// </summary>
 class OreManager final {
 public: // ** メンバ関数 ** //
+
+	/// <summary>
+	/// コンストラクタ
+	/// </summary>
+	OreManager();
 
 	/// <summary>
 	/// 初期化
@@ -41,10 +48,12 @@ private: // ** メンバ変数 ** //
 	// 鉱石たち
 	std::vector<IOre*> ores_;
 	// ノルマ
-	int quota_;
-
+	int quota_ = 0;
 	// 鉱石たちの中で最大の高さ
 	float highestY_ = 0.0f;
+
+	// 鉱石がダメージを受けたときのパーティクル
+	OreParticle particle_;
 
 
 	// ブロックの種類

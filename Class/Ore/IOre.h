@@ -16,6 +16,10 @@ public: // ** メンバ関数 ** //
 	/// </summary>
 	virtual void Update();
 
+	void SetParticleFunction(std::function<void(LWP::Math::Vector3)> ore, std::function<void(LWP::Math::Vector3)> shine) {
+		ore_ = ore;
+		shine_ = shine;
+	}
 	/// <summary>
 	/// この鉱石を破壊したときのスコアを設定する
 	/// </summary>
@@ -58,6 +62,10 @@ protected: // ** メンバ変数 ** //
 	// この鉱石のスコア
 	int score_ = 1;
 
+	// 破片のパーティクル
+	std::function<void(LWP::Math::Vector3)> ore_;
+	// 輝きのパーティクル
+	std::function<void(LWP::Math::Vector3)> shine_;
 
 protected: // ** メンバ関数 ** //
 
